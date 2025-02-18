@@ -3,22 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Camarón Que Se Duerme</title>
-  <!-- Estilos generales -->
   <style>
-    /* --------- RESET BÁSICO --------- */
+    /* RESET BÁSICO */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: 'Helvetica Now', Helvetica, Arial, sans-serif;
       background-color: #1c1b29; /* Fondo oscuro */
       color: #fff;              /* Texto claro */
     }
-
-    /* --------- ENCABEZADO (LANDING) --------- */
+    /* PANTALLA DE INICIO (LANDING) */
     header.landing {
       text-align: center;
       padding: 40px 20px;
@@ -35,8 +32,6 @@
       color: #ccc;
       letter-spacing: 1px;
     }
-
-    /* Contenedor de botones en el landing */
     .icons-container {
       display: flex;
       justify-content: center;
@@ -63,8 +58,7 @@
       transform: scale(1.05);
       background-color: #3c3b4a;
     }
-
-    /* Buscador en el landing */
+    /* BUSCADOR EN EL LANDING */
     #searchInput {
       display: block;
       margin: 0 auto;
@@ -79,10 +73,9 @@
     #searchInput::placeholder {
       color: #aaa;
     }
-
-    /* --------- CONTENEDOR DE PÁGINAS --------- */
+    /* CONTENEDOR DE PÁGINAS */
     #pages {
-      display: none; /* Oculto hasta que se elija una sección o se muestren resultados */
+      display: none; /* Oculto hasta que se elija una sección o haya resultados */
     }
     #pages section {
       display: none;
@@ -91,8 +84,7 @@
     #pages section.active {
       display: block;
     }
-
-    /* Botón "Inicio" en la parte superior de las páginas */
+    /* BOTÓN "INICIO" */
     .page-top-nav {
       text-align: center;
       margin: 10px 0 20px 0;
@@ -109,8 +101,7 @@
     .page-top-nav .nav-home:hover {
       background-color: #3c3b4a;
     }
-
-    /* --------- SUBNAVEGACIÓN DE LIBROS --------- */
+    /* SUBNAVEGACIÓN DE LIBROS */
     .subnav {
       display: flex;
       justify-content: center;
@@ -129,8 +120,7 @@
     .subnav-item:hover {
       background-color: #3c3b4a;
     }
-
-    /* --------- GRID DE ÍTEMS --------- */
+    /* GRID DE ÍTEMS */
     .items-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -145,6 +135,7 @@
       text-align: center;
       transition: transform 0.2s ease;
       position: relative;
+      cursor: pointer;
     }
     .item-card:hover {
       transform: scale(1.03);
@@ -159,9 +150,6 @@
       font-weight: bold;
       text-decoration: none;
       color: #fff;
-    }
-    .item-card .item-title:hover {
-      text-decoration: underline;
     }
     .delete-btn {
       position: absolute;
@@ -178,8 +166,30 @@
     .delete-btn:hover {
       background-color: #c9302c;
     }
-
-    /* --------- FORMULARIO PARA AGREGAR --------- */
+    /* CONTENEDOR DE SUB-ENLACES (DESPLEGABLE) */
+    .sublink-container {
+      display: none;
+      background-color: #1c1b29;
+      border-top: 1px solid #555;
+      padding: 10px;
+      text-align: left;
+    }
+    .sublink-container ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sublink-container li {
+      margin: 5px 0;
+    }
+    .sublink-container a {
+      color: #4fa3ff;
+      text-decoration: none;
+    }
+    .sublink-container a:hover {
+      text-decoration: underline;
+    }
+    /* FORMULARIO PARA AGREGAR (PRIMERO) */
     .add-item-form {
       display: none;
       background-color: #2c2b3a;
@@ -225,8 +235,50 @@
     .add-item-form button:hover {
       background-color: #3367D6;
     }
-
-    /* --------- RESULTADOS DE BÚSQUEDA --------- */
+    /* FORMULARIO PARA AGREGAR 2 (SUB-ENLACES) */
+    .add-sublink-form {
+      display: none;
+      background-color: #2c2b3a;
+      color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+    }
+    .add-sublink-form h2 {
+      margin-top: 0;
+    }
+    .add-sublink-form label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .add-sublink-form input,
+    .add-sublink-form select,
+    .add-sublink-form button {
+      margin-top: 5px;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      background-color: #1c1b29;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    .add-sublink-form button {
+      background-color: #ffa000;
+      border: none;
+      font-weight: bold;
+      margin-top: 15px;
+      transition: background-color 0.2s ease;
+    }
+    .add-sublink-form button:hover {
+      background-color: #ff8f00;
+    }
+    /* RESULTADOS DE BÚSQUEDA */
     #pageSearch div#searchResults div {
       border: 1px solid #555;
       background-color: #2c2b3a;
@@ -246,7 +298,6 @@
   <header class="landing" id="landingSection">
     <h1>CAMARÓN QUE SE DUERME</h1>
     <h2>MILES DE POSIBILIDADES</h2>
-
     <div class="icons-container">
       <!-- LIBROS -->
       <div class="icon-item" data-target="pageLibros">
@@ -260,13 +311,16 @@
       <div class="icon-item" data-target="pageMangas">
         <p>Mangas</p>
       </div>
-      <!-- AGREGAR -->
+      <!-- AGREGAR (formulario 1) -->
       <div class="icon-item" data-target="toggleForm">
         <p>Agregar</p>
       </div>
+      <!-- AGREGAR 2 (formulario de sub-enlaces) -->
+      <div class="icon-item" data-target="toggleSubLinkForm">
+        <p>Agregar 2</p>
+      </div>
     </div>
-
-    <!-- Buscador en la pantalla de inicio -->
+    <!-- Buscador en el landing -->
     <input type="text" id="searchInput" placeholder="Buscar...">
   </header>
 
@@ -276,7 +330,6 @@
     <div class="page-top-nav">
       <span class="nav-home" id="btnHome">Inicio</span>
     </div>
-
     <!-- Página de Libros -->
     <section id="pageLibros">
       <h2>Libros</h2>
@@ -300,19 +353,16 @@
         </section>
       </div>
     </section>
-
     <!-- Página de Mangas -->
     <section id="pageMangas">
       <h2>Mangas</h2>
       <div class="items-grid" id="mangasGrid"></div>
     </section>
-
     <!-- Página de Novelas Ligeras -->
     <section id="pageNovelas">
       <h2>Novelas Ligeras</h2>
       <div class="items-grid" id="novelasGrid"></div>
     </section>
-
     <!-- Página de Resultados de Búsqueda -->
     <section id="pageSearch">
       <h2>Resultados de Búsqueda</h2>
@@ -320,18 +370,15 @@
     </section>
   </div>
 
-  <!-- FORMULARIO PARA AGREGAR NUEVO ÍTEM -->
+  <!-- FORMULARIO PARA AGREGAR NUEVO ÍTEM (PRIMARIO) -->
   <form class="add-item-form" id="addItemForm">
     <h2>Agregar nuevo</h2>
     <label for="itemImage">Portada (Imagen)</label>
     <input type="file" id="itemImage" accept="image/*" required>
-    
     <label for="itemTitle">Título</label>
     <input type="text" id="itemTitle" placeholder="Ej. Boruto: Two Blue Vortex" required>
-    
     <label for="itemLink">Enlace (URL o archivo)</label>
     <input type="text" id="itemLink" placeholder="Ej. https://miarchivo.pdf" required>
-    
     <label for="itemCategory">Categoría</label>
     <select id="itemCategory" required>
       <option value="">-- Selecciona --</option>
@@ -341,80 +388,55 @@
       <option value="mangas">Mangas</option>
       <option value="novelas">Novelas Ligeras</option>
     </select>
-    
     <button type="submit">Agregar</button>
   </form>
 
-  <!-- Se incluye Fuse.js para la búsqueda difusa -->
+  <!-- FORMULARIO PARA AGREGAR 2 (SUB-ENLACES) -->
+  <form class="add-sublink-form" id="addSubLinkForm">
+    <h2>Agregar sub-enlaces a un ítem existente</h2>
+    <label for="parentItem">Elige un ítem:</label>
+    <select id="parentItem"></select>
+    <label for="subLinkLabel">Etiqueta (Ej. "Tomo 1", "Libro 2", etc.)</label>
+    <input type="text" id="subLinkLabel" required>
+    <label for="subLinkUrl">Enlace (URL o archivo)</label>
+    <input type="text" id="subLinkUrl" required>
+    <label for="subLinkOrder">Orden (número)</label>
+    <input type="number" id="subLinkOrder" placeholder="Opcional" min="0">
+    <button type="submit">Agregar sub-enlace</button>
+  </form>
+
+  <!-- BIBLIOTECA FUSE.JS PARA BÚSQUEDA DIFUSA -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <script>
+    // Constante de contraseña
+    const PASSWORD = "*365<vlQyOAV";
+
     /***************************************************
-     * 1. MOSTRAR/OCULTAR SECCIONES
+     * 1. LANDING, PÁGINAS Y BOTÓN "INICIO"
      **************************************************/
     const landingSection = document.getElementById('landingSection');
     const pagesContainer = document.getElementById('pages');
     const btnHome = document.getElementById('btnHome');
 
-    // Función para volver al Landing
     function showLanding() {
       landingSection.style.display = 'block';
       pagesContainer.style.display = 'none';
     }
-
-    // Función para mostrar una sección
     function showPage(pageId) {
-      // Ocultar landing
       landingSection.style.display = 'none';
-      // Mostrar contenedor de páginas
       pagesContainer.style.display = 'block';
-      // Activar la sección deseada
       document.querySelectorAll('#pages section').forEach(section => {
         section.classList.remove('active');
       });
       document.getElementById(pageId).classList.add('active');
     }
-
-    // Botón "Inicio" en las páginas
     btnHome.addEventListener('click', function() {
       showLanding();
     });
 
-    // Click en los iconos del landing
-    document.querySelectorAll('.icon-item').forEach(icon => {
-      icon.addEventListener('click', function() {
-        const target = this.getAttribute('data-target');
-        if (target === 'toggleForm') {
-          // Mostrar/ocultar formulario sin cambiar de página
-          const form = document.getElementById('addItemForm');
-          form.style.display = (form.style.display === 'block') ? 'none' : 'block';
-        } else {
-          showPage(target);
-          // Si es la página de Libros, mostrar por defecto la subpágina "Universitarios"
-          if (target === 'pageLibros') {
-            showLibrosSubPage('pageLibrosUniversitarios');
-          }
-        }
-      });
-    });
-
-    // Subnavegación en Libros
-    function showLibrosSubPage(subPageId) {
-      document.querySelectorAll('#librosContent section').forEach(section => {
-        section.classList.remove('active');
-      });
-      document.getElementById(subPageId).classList.add('active');
-    }
-    document.querySelectorAll('.subnav-item').forEach(item => {
-      item.addEventListener('click', function() {
-        const target = this.getAttribute('data-target');
-        showLibrosSubPage(target);
-      });
-    });
-
     /***************************************************
-     * 2. DATOS DE SECCIONES Y DE ÍTEMS (BÚSQUEDA)
+     * 2. DATOS DE SECCIONES E ÍTEMS (LOCALSTORAGE)
      **************************************************/
-    // Secciones estáticas
     const pagesData = [
       { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.', type: 'page' },
       { id: 'pageLibrosObras',         title: 'Obras Clásicas',       content: 'Contenido de Obras Clásicas.',       type: 'page' },
@@ -423,107 +445,141 @@
       { id: 'pageNovelas',             title: 'Novelas Ligeras',      content: 'Contenido de la página de Novelas Ligeras.', type: 'page' }
     ];
 
-    // Ítems dinámicos se guardan en localStorage
     let items = JSON.parse(localStorage.getItem('items')) || [];
-
     function saveItems() {
       localStorage.setItem('items', JSON.stringify(items));
     }
 
-    // Combinar secciones e ítems para la búsqueda
-    function getSearchData() {
-      // Transformamos cada ítem en un objeto con {title, content, category, id, type:"item"}
-      const dynamicData = items.map(item => ({
-        id: item.id,
-        title: item.title,
-        content: item.title, // Podrías añadir más info si deseas
-        category: item.category,
-        type: 'item'
-      }));
-      return pagesData.concat(dynamicData);
-    }
-
     /***************************************************
-     * 3. BÚSQUEDA (FUSE.JS)
+     * 3. FORMULARIO "AGREGAR" (NUEVO ÍTEM)
      **************************************************/
-    function doSearch(query) {
-      const allData = getSearchData();
-      const fuse = new Fuse(allData, {
-        keys: ['title', 'content'],
-        threshold: 0.4
-      });
-      const results = fuse.search(query);
+    const addItemForm = document.getElementById('addItemForm');
+    const itemImageInput = document.getElementById('itemImage');
+    const itemTitleInput = document.getElementById('itemTitle');
+    const itemLinkInput = document.getElementById('itemLink');
+    const itemCategorySelect = document.getElementById('itemCategory');
 
-      // Mostrar resultados en la sección "pageSearch"
-      const resultsContainer = document.getElementById('searchResults');
-      resultsContainer.innerHTML = '';
-      if (results.length === 0) {
-        resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
-      } else {
-        results.forEach(result => {
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
-          div.addEventListener('click', function() {
-            // Si es un ítem, navegar a su categoría
-            if (result.item.type === 'item') {
-              const cat = result.item.category;
-              if (cat === 'libros-universitarios') {
-                showPage('pageLibros');
-                showLibrosSubPage('pageLibrosUniversitarios');
-              } else if (cat === 'libros-obras') {
-                showPage('pageLibros');
-                showLibrosSubPage('pageLibrosObras');
-              } else if (cat === 'libros-medicina') {
-                showPage('pageLibros');
-                showLibrosSubPage('pageLibrosMedicina');
-              } else if (cat === 'mangas') {
-                showPage('pageMangas');
-              } else if (cat === 'novelas') {
-                showPage('pageNovelas');
-              }
-            } else {
-              // Si es una sección estática
-              showPage(result.item.id);
-              if (result.item.id.startsWith('pageLibros')) {
-                showLibrosSubPage(result.item.id);
-              }
-            }
-          });
-          resultsContainer.appendChild(div);
-        });
+    addItemForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Solicitar contraseña para agregar
+      const pass = prompt("Ingrese la contraseña para agregar:");
+      if (pass !== PASSWORD) {
+        alert("Contraseña incorrecta.");
+        return;
       }
-      showPage('pageSearch');
-    }
-
-    // Evento para el buscador en la pantalla de inicio
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const query = this.value.trim();
-      if (query.length > 0) {
-        doSearch(query);
+      const file = itemImageInput.files[0];
+      const title = itemTitleInput.value.trim();
+      const link = itemLinkInput.value.trim();
+      const category = itemCategorySelect.value;
+      if (!file || !title || !link || !category) {
+        alert('Por favor, completa todos los campos.');
+        return;
       }
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const imageDataUrl = event.target.result;
+        const newId = 'item-' + Date.now();
+        const newItem = {
+          id: newId,
+          imageDataUrl,
+          title,
+          link,
+          category,
+          type: 'item',
+          subLinks: []
+        };
+        items.push(newItem);
+        saveItems();
+        renderItems();
+        addItemForm.reset();
+        addItemForm.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
     });
 
     /***************************************************
-     * 4. RENDERIZAR ÍTEMS EN SUS RESPECTIVAS SECCIONES
+     * 4. FORMULARIO "AGREGAR 2" (SUB-ENLACES)
+     **************************************************/
+    const addSubLinkForm = document.getElementById('addSubLinkForm');
+    const parentItemSelect = document.getElementById('parentItem');
+    const subLinkLabelInput = document.getElementById('subLinkLabel');
+    const subLinkUrlInput = document.getElementById('subLinkUrl');
+    const subLinkOrderInput = document.getElementById('subLinkOrder');
+
+    function fillItemDropdown() {
+      parentItemSelect.innerHTML = '<option value="">-- Selecciona un ítem --</option>';
+      items.forEach(i => {
+        const opt = document.createElement('option');
+        opt.value = i.id;
+        opt.textContent = i.title;
+        parentItemSelect.appendChild(opt);
+      });
+    }
+
+    addSubLinkForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Solicitar contraseña para agregar sub-enlace
+      const pass = prompt("Ingrese la contraseña para agregar sub-enlace:");
+      if (pass !== PASSWORD) {
+        alert("Contraseña incorrecta.");
+        return;
+      }
+      const parentId = parentItemSelect.value;
+      const label = subLinkLabelInput.value.trim();
+      const url = subLinkUrlInput.value.trim();
+      const order = subLinkOrderInput.value.trim();
+      if (!parentId || !label || !url) {
+        alert('Por favor, completa todos los campos requeridos.');
+        return;
+      }
+      const parentItem = items.find(it => it.id === parentId);
+      if (!parentItem) {
+        alert('No se encontró el ítem seleccionado.');
+        return;
+      }
+      if (!parentItem.subLinks) {
+        parentItem.subLinks = [];
+      }
+      const subLinkObj = {
+        label,
+        link: url,
+        order: order !== '' ? parseInt(order, 10) : 0
+      };
+      parentItem.subLinks.push(subLinkObj);
+      saveItems();
+      renderItems();
+      addSubLinkForm.reset();
+      addSubLinkForm.style.display = 'none';
+    });
+
+    /***************************************************
+     * 5. RENDERIZAR ÍTEMS EN SUS SECCIONES
      **************************************************/
     function renderItems() {
-      // Limpiar grids
       document.getElementById('universitariosGrid').innerHTML = '';
       document.getElementById('obrasGrid').innerHTML = '';
       document.getElementById('medicinaGrid').innerHTML = '';
       document.getElementById('mangasGrid').innerHTML = '';
       document.getElementById('novelasGrid').innerHTML = '';
-
       items.forEach(item => {
         const card = document.createElement('div');
         card.classList.add('item-card');
         card.innerHTML = `
-          <a href="${item.link}" target="_blank">
-            <img src="${item.imageDataUrl}" alt="${item.title}">
-            <p class="item-title">${item.title}</p>
-          </a>
+          <img src="${item.imageDataUrl}" alt="${item.title}">
+          <p class="item-title">${item.title}</p>
+          <div class="sublink-container"></div>
           <button class="delete-btn" data-id="${item.id}">Eliminar</button>
         `;
+        card.addEventListener('click', function(e) {
+          if(e.target.classList.contains('delete-btn')) return;
+          const sublinkDiv = card.querySelector('.sublink-container');
+          if (sublinkDiv.style.display === 'block') {
+            sublinkDiv.style.display = 'none';
+          } else {
+            sublinkDiv.innerHTML = generateSubLinksHTML(item);
+            sublinkDiv.style.display = 'block';
+          }
+        });
         switch (item.category) {
           case 'libros-universitarios':
             document.getElementById('universitariosGrid').appendChild(card);
@@ -542,14 +598,31 @@
             break;
         }
       });
-
-      // Asignar eventos para eliminar
       document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const pass = prompt("Ingrese la contraseña para eliminar:");
+          if (pass !== PASSWORD) {
+            alert("Contraseña incorrecta.");
+            return;
+          }
           const idToDelete = this.getAttribute('data-id');
           deleteItem(idToDelete);
         });
       });
+    }
+
+    function generateSubLinksHTML(item) {
+      let html = '<ul>';
+      html += `<li><a href="${item.link}" target="_blank">[Principal] ${item.title}</a></li>`;
+      if (item.subLinks && item.subLinks.length > 0) {
+        const sorted = [...item.subLinks].sort((a, b) => (a.order || 0) - (b.order || 0));
+        sorted.forEach(sub => {
+          html += `<li><a href="${sub.link}" target="_blank">${sub.label}</a></li>`;
+        });
+      }
+      html += '</ul>';
+      return html;
     }
 
     function deleteItem(id) {
@@ -557,51 +630,101 @@
       saveItems();
       renderItems();
     }
-
-    // Render inicial al cargar
     renderItems();
 
     /***************************************************
-     * 5. FORMULARIO DE "AGREGAR NUEVO"
+     * 6. BÚSQUEDA (FUSE.JS)
      **************************************************/
-    const addItemForm = document.getElementById('addItemForm');
-    const itemImageInput = document.getElementById('itemImage');
-    const itemTitleInput = document.getElementById('itemTitle');
-    const itemLinkInput = document.getElementById('itemLink');
-    const itemCategorySelect = document.getElementById('itemCategory');
+    function getSearchData() {
+      const dynamicData = items.map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.title,
+        category: item.category,
+        type: 'item'
+      }));
+      return pagesData.concat(dynamicData);
+    }
 
-    addItemForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const file = itemImageInput.files[0];
-      const title = itemTitleInput.value.trim();
-      const link = itemLinkInput.value.trim();
-      const category = itemCategorySelect.value;
-
-      if (!file || !title || !link || !category) {
-        alert('Por favor, completa todos los campos.');
-        return;
+    function doSearch(query) {
+      const allData = getSearchData();
+      const fuse = new Fuse(allData, {
+        keys: ['title', 'content'],
+        threshold: 0.4
+      });
+      const results = fuse.search(query);
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.innerHTML = '';
+      if (results.length === 0) {
+        resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
+      } else {
+        results.forEach(result => {
+          const div = document.createElement('div');
+          div.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
+          div.addEventListener('click', function() {
+            if (result.item.type === 'item') {
+              const cat = result.item.category;
+              if (cat === 'libros-universitarios') {
+                showPage('pageLibros');
+                showLibrosSubPage('pageLibrosUniversitarios');
+              } else if (cat === 'libros-obras') {
+                showPage('pageLibros');
+                showLibrosSubPage('pageLibrosObras');
+              } else if (cat === 'libros-medicina') {
+                showPage('pageLibros');
+                showLibrosSubPage('pageLibrosMedicina');
+              } else if (cat === 'mangas') {
+                showPage('pageMangas');
+              } else if (cat === 'novelas') {
+                showPage('pageNovelas');
+              }
+            } else {
+              showPage(result.item.id);
+              if (result.item.id.startsWith('pageLibros')) {
+                showLibrosSubPage(result.item.id);
+              }
+            }
+          });
+          resultsContainer.appendChild(div);
+        });
       }
-
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const imageDataUrl = event.target.result;
-        const newId = 'item-' + Date.now();
-        const newItem = {
-          id: newId,
-          imageDataUrl,
-          title,
-          link,
-          category,
-          type: 'item'
-        };
-        items.push(newItem);
-        saveItems();
-        renderItems();
-        addItemForm.reset();
-        addItemForm.style.display = 'none';
-      };
-      reader.readAsDataURL(file);
+      showPage('pageSearch');
+    }
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const query = this.value.trim();
+      if (query.length > 0) {
+        doSearch(query);
+      }
     });
+
+    /***************************************************
+     * 7. EVENTOS PARA MOSTRAR/OCULTAR FORMULARIOS Y NAVEGAR
+     **************************************************/
+    document.querySelectorAll('.icon-item').forEach(icon => {
+      icon.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        if (target === 'toggleForm') {
+          const form = document.getElementById('addItemForm');
+          form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+        } else if (target === 'toggleSubLinkForm') {
+          fillItemDropdown();
+          const subLinkForm = document.getElementById('addSubLinkForm');
+          subLinkForm.style.display = (subLinkForm.style.display === 'block') ? 'none' : 'block';
+        } else {
+          showPage(target);
+          if (target === 'pageLibros') {
+            showLibrosSubPage('pageLibrosUniversitarios');
+          }
+        }
+      });
+    });
+
+    function showLibrosSubPage(subPageId) {
+      document.querySelectorAll('#librosContent section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(subPageId).classList.add('active');
+    }
   </script>
 </body>
 </html>
