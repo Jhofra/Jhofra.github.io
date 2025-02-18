@@ -73,7 +73,6 @@
     #librosContent section.active {
       display: block;
     }
-
     /* --- Estilos para las cuadrículas (grid) de ítems --- */
     .items-grid {
       display: grid;
@@ -88,7 +87,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       text-align: center;
       transition: transform 0.2s ease;
-      position: relative; /* Para posicionar botón de eliminar */
+      position: relative;
     }
     .item-card:hover {
       transform: scale(1.03);
@@ -107,7 +106,6 @@
     .item-card .item-title:hover {
       text-decoration: underline;
     }
-    /* Botón de eliminar */
     .delete-btn {
       position: absolute;
       top: 5px;
@@ -123,10 +121,9 @@
     .delete-btn:hover {
       background-color: #c9302c;
     }
-
     /* Formulario para agregar ítems */
     .add-item-form {
-      display: none; /* Oculto por defecto, se muestra al hacer clic en "Agregar" */
+      display: none;
       background-color: #fff;
       padding: 15px;
       border-radius: 5px;
@@ -198,17 +195,14 @@
       <div id="librosContent">
         <section id="pageLibrosUniversitarios" class="active">
           <h3>Libros Universitarios</h3>
-          <!-- Grid de ítems para Universitarios -->
           <div class="items-grid" id="universitariosGrid"></div>
         </section>
         <section id="pageLibrosObras">
           <h3>Obras Clásicas</h3>
-          <!-- Grid de ítems para Obras Clásicas -->
           <div class="items-grid" id="obrasGrid"></div>
         </section>
         <section id="pageLibrosMedicina">
           <h3>Libros de Medicina</h3>
-          <!-- Grid de ítems para Libros de Medicina -->
           <div class="items-grid" id="medicinaGrid"></div>
         </section>
       </div>
@@ -217,14 +211,12 @@
     <!-- Página de Mangas -->
     <section id="pageMangas">
       <h2>Mangas</h2>
-      <!-- Grid de ítems para Mangas -->
       <div class="items-grid" id="mangasGrid"></div>
     </section>
     
     <!-- Página de Novelas Ligeras -->
     <section id="pageNovelas">
       <h2>Novelas Ligeras</h2>
-      <!-- Grid de ítems para Novelas Ligeras -->
       <div class="items-grid" id="novelasGrid"></div>
     </section>
     
@@ -235,7 +227,7 @@
     </section>
   </div>
   
-  <!-- Formulario para agregar nuevo item (libro, manga o novela) -->
+  <!-- Formulario para agregar nuevo ítem -->
   <form class="add-item-form" id="addItemForm">
     <h2>Agregar nuevo</h2>
     <label for="itemImage">Portada (Imagen)</label>
@@ -283,11 +275,7 @@
         } else if (target === 'toggleForm') {
           // Mostrar/ocultar formulario
           const form = document.getElementById('addItemForm');
-          if (form.style.display === 'none' || form.style.display === '') {
-            form.style.display = 'block';
-          } else {
-            form.style.display = 'none';
-          }
+          form.style.display = (form.style.display === 'block') ? 'none' : 'block';
         } else {
           showPage(target);
         }
@@ -310,25 +298,39 @@
     });
 
     /***************************************************
-     * 2. BÚSQUEDA CON FUSE.JS (Secciones principales)
+     * 2. BÚSQUEDA CON FUSE.JS (SECCIONES + ÍTEMS)
      **************************************************/
-    // Datos para la búsqueda (cada objeto representa la "página" o sección principal)
+    // Datos estáticos de secciones
     const pagesData = [
-      { id: 'pageInicio', title: 'Inicio', content: 'Bienvenido a Camarón Que Se Duerme. Esta es la página de inicio.' },
-      { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.' },
-      { id: 'pageLibrosObras', title: 'Obras Clásicas', content: 'Contenido de Obras Clásicas.' },
-      { id: 'pageLibrosMedicina', title: 'Libros de Medicina', content: 'Contenido de Libros de Medicina.' },
-      { id: 'pageMangas', title: 'Mangas', content: 'Contenido de la página de Mangas.' },
-      { id: 'pageNovelas', title: 'Novelas Ligeras', content: 'Contenido de la página de Novelas Ligeras.' }
+      { id: 'pageInicio', title: 'Inicio', content: 'Bienvenido a Camarón Que Se Duerme. Esta es la página de inicio.', type: 'page' },
+      { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.', type: 'page' },
+      { id: 'pageLibrosObras', title: 'Obras Clásicas', content: 'Contenido de Obras Clásicas.', type: 'page' },
+      { id: 'pageLibrosMedicina', title: 'Libros de Medicina', content: 'Contenido de Libros de Medicina.', type: 'page' },
+      { id: 'pageMangas', title: 'Mangas', content: 'Contenido de la página de Mangas.', type: 'page' },
+      { id: 'pageNovelas', title: 'Novelas Ligeras', content: 'Contenido de la página de Novelas Ligeras.', type: 'page' }
     ];
     
-    const fuse = new Fuse(pagesData, {
-      keys: ['title', 'content'],
-      threshold: 0.4
-    });
+    // Combina datos estáticos y dinámicos para búsqueda
+    function getSearchData() {
+      const dynamicData = items.map(item => {
+        return {
+          id: item.id,
+          title: item.title,
+          content: item.title,  // Puedes ampliar con más información si lo deseas
+          type: 'item',
+          category: item.category
+        };
+      });
+      return pagesData.concat(dynamicData);
+    }
     
     function doSearch(query) {
-      const results = fuse.search(query);
+      const searchData = getSearchData();
+      const fuseCombined = new Fuse(searchData, {
+        keys: ['title', 'content'],
+        threshold: 0.4
+      });
+      const results = fuseCombined.search(query);
       const resultsContainer = document.getElementById('searchResults');
       resultsContainer.innerHTML = '';
       if (results.length === 0) {
@@ -341,13 +343,25 @@
           item.style.margin = '5px';
           item.style.cursor = 'pointer';
           item.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
-          
           item.addEventListener('click', function() {
-            // Verificamos si pertenece a una subpágina de Libros
-            if (['pageLibrosUniversitarios','pageLibrosObras','pageLibrosMedicina'].includes(result.item.id)) {
-              showPage('pageLibros');
-              showLibrosSubPage(result.item.id);
+            // Si es un ítem dinámico, mostrar la página correspondiente según la categoría
+            if (result.item.type === 'item') {
+              if (result.item.category === 'libros-universitarios') {
+                showPage('pageLibros');
+                showLibrosSubPage('pageLibrosUniversitarios');
+              } else if (result.item.category === 'libros-obras') {
+                showPage('pageLibros');
+                showLibrosSubPage('pageLibrosObras');
+              } else if (result.item.category === 'libros-medicina') {
+                showPage('pageLibros');
+                showLibrosSubPage('pageLibrosMedicina');
+              } else if (result.item.category === 'mangas') {
+                showPage('pageMangas');
+              } else if (result.item.category === 'novelas') {
+                showPage('pageNovelas');
+              }
             } else {
+              // Si es una sección estática
               showPage(result.item.id);
             }
           });
@@ -365,22 +379,17 @@
     });
 
     /***************************************************
-     * 3. PERSISTENCIA DE ÍTEMS (Libros/Mangas/Novelas)
-     *    Se guardan en localStorage
+     * 3. PERSISTENCIA DE ÍTEMS (localStorage)
+     * Cada ítem: { id, imageDataUrl, title, link, category, type:"item" }
      **************************************************/
-    // Estructura de cada ítem:
-    // { id, imageDataUrl, title, link, category }
-
     let items = JSON.parse(localStorage.getItem('items')) || [];
-
-    // Guardar en localStorage
+    
     function saveItems() {
       localStorage.setItem('items', JSON.stringify(items));
     }
-
-    // Renderizar ítems en cada grid según categoría
+    
     function renderItems() {
-      // Primero limpiamos cada contenedor
+      // Limpiar todas las cuadrículas
       document.getElementById('universitariosGrid').innerHTML = '';
       document.getElementById('obrasGrid').innerHTML = '';
       document.getElementById('medicinaGrid').innerHTML = '';
@@ -397,8 +406,7 @@
           </a>
           <button class="delete-btn" data-id="${item.id}">Eliminar</button>
         `;
-        
-        // Insertar según categoría
+        // Insertar en la cuadrícula según la categoría
         switch (item.category) {
           case 'libros-universitarios':
             document.getElementById('universitariosGrid').appendChild(card);
@@ -418,7 +426,7 @@
         }
       });
       
-      // Botones de eliminar
+      // Asignar eventos para botones de eliminar
       document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
           const idToDelete = e.target.getAttribute('data-id');
@@ -426,19 +434,17 @@
         });
       });
     }
-
-    // Eliminar ítem por id
+    
     function deleteItem(id) {
       items = items.filter(item => item.id !== id);
       saveItems();
       renderItems();
     }
-
-    // Al cargar la página, renderizamos lo que haya en localStorage
+    
     renderItems();
-
+    
     /***************************************************
-     * 4. AGREGAR NUEVO ÍTEM (formulario)
+     * 4. AGREGAR NUEVO ÍTEM (Formulario)
      **************************************************/
     const addItemForm = document.getElementById('addItemForm');
     const itemImageInput = document.getElementById('itemImage');
@@ -447,8 +453,7 @@
     const itemCategorySelect = document.getElementById('itemCategory');
     
     addItemForm.addEventListener('submit', function(event) {
-      event.preventDefault(); // Evita recargar la página
-      
+      event.preventDefault();
       const file = itemImageInput.files[0];
       const title = itemTitleInput.value.trim();
       const link = itemLinkInput.value.trim();
@@ -462,25 +467,18 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const imageDataUrl = e.target.result;
-        
-        // Crear un id único
         const newId = 'item-' + Date.now();
-        
-        // Crear objeto y agregarlo al array
         const newItem = {
           id: newId,
           imageDataUrl,
           title,
           link,
-          category
+          category,
+          type: 'item'
         };
         items.push(newItem);
-        
-        // Guardar y renderizar
         saveItems();
         renderItems();
-        
-        // Limpiar formulario y ocultarlo
         addItemForm.reset();
         addItemForm.style.display = 'none';
       };
