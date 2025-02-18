@@ -16,7 +16,6 @@
       color: #333;
       margin: 0;
     }
-
     /* ENCABEZADO */
     header {
       display: flex;
@@ -24,10 +23,10 @@
       background-color: #4285F4;
       color: #fff;
       padding: 10px;
-      position: relative; /* Para posicionar la barra de búsqueda */
+      position: relative;
+      justify-content: space-between;
     }
     header .logo-images {
-      flex: 1; /* Ocupa el espacio para alinear a la izquierda la barra de búsqueda */
       display: flex;
       align-items: center;
       gap: 15px;
@@ -41,7 +40,7 @@
     .search-container {
       position: absolute;
       left: 20px;
-      bottom: -20px; /* Hace que la barra “flote” un poco bajo el header */
+      bottom: -20px;
       background-color: #fff;
       border-radius: 4px;
       padding: 5px;
@@ -52,7 +51,16 @@
       outline: none;
       padding: 5px;
     }
-
+    /* BOTÓN DE ADMINISTRADOR */
+    #toggleAdminBtn {
+      background: #fff;
+      color: #4285F4;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
     /* MENÚ LATERAL (NAV) */
     nav {
       width: 200px;
@@ -62,7 +70,7 @@
     }
     nav ul {
       list-style: none;
-      margin-top: 60px; /* Deja espacio arriba para que no se superponga con la barra de búsqueda */
+      margin-top: 60px;
     }
     nav ul li {
       margin-bottom: 10px;
@@ -72,12 +80,11 @@
       color: #4285F4;
       font-weight: bold;
     }
-
     /* CONTENIDO PRINCIPAL */
     main {
       flex: 1;
       padding: 20px;
-      margin-top: 40px; /* Espacio para que no se superponga con la barra de búsqueda */
+      margin-top: 40px;
     }
     section {
       background-color: #fff;
@@ -98,10 +105,9 @@
     .book:last-child {
       border-bottom: none;
     }
-
     /* RESULTADOS DE BÚSQUEDA */
     #searchResults {
-      display: none; /* Oculto por defecto */
+      display: none;
     }
     .search-result {
       border-bottom: 1px solid #ddd;
@@ -110,18 +116,58 @@
     .search-result:last-child {
       border-bottom: none;
     }
-
     /* CONTENEDOR PRINCIPAL (NAV + MAIN) */
     .container {
       display: flex;
     }
-
     /* PIE DE PÁGINA */
     footer {
       background-color: #eee;
       text-align: center;
       padding: 10px;
       margin-top: 20px;
+    }
+    /* PANEL DE ADMINISTRADOR */
+    #adminPanel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #adminPanel .admin-content {
+      background: #fff;
+      padding: 20px;
+      width: 80%;
+      max-height: 90%;
+      overflow-y: auto;
+      border-radius: 5px;
+      position: relative;
+    }
+    #adminPanel button#closeAdminBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #4285F4;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .admin-section {
+      margin-bottom: 20px;
+    }
+    .admin-section input,
+    .admin-section textarea {
+      width: 100%;
+      margin-top: 5px;
+      padding: 5px;
     }
   </style>
 </head>
@@ -130,26 +176,20 @@
   <!-- ENCABEZADO -->
   <header>
     <div class="logo-images">
-      <!-- Sustituye estas URLs por las de tus imágenes reales -->
-      <img 
-        src="https://raw.githubusercontent.com/Jhofra/Camaron-que-se-duerme/main/camaron1.jpg" 
-        alt="Camarón 1">
-      <img 
-        src="https://raw.githubusercontent.com/Jhofra/Camaron-que-se-duerme/main/camaron2.jpg" 
-        alt="Camarón 2">
+      <img src="https://raw.githubusercontent.com/Jhofra/Camaron-que-se-duerme/main/camaron1.jpg" alt="Camarón 1">
+      <img src="https://raw.githubusercontent.com/Jhofra/Camaron-que-se-duerme/main/camaron2.jpg" alt="Camarón 2">
     </div>
 
-    <!-- BARRA DE BÚSQUEDA -->
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Buscar libros o autores...">
     </div>
+
+    <button id="toggleAdminBtn">Modo Creador</button>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL: NAV + MAIN -->
   <div class="container">
-    <!-- MENÚ LATERAL -->
     <nav>
-      <ul>
+      <ul id="navList">
         <li><a href="#obras-literarias">Obras Literarias</a></li>
         <li><a href="#mangas">Mangas</a></li>
         <li><a href="#novelas-ligeras">Novelas Ligeras</a></li>
@@ -161,15 +201,12 @@
       </ul>
     </nav>
 
-    <!-- MAIN -->
-    <main>
-      <!-- Sección de Resultados de Búsqueda -->
+    <main id="mainContent">
       <section id="searchResults">
         <h2>Resultados de Búsqueda</h2>
         <div id="resultsContainer"></div>
       </section>
 
-      <!-- Secciones por categoría -->
       <section id="obras-literarias">
         <h2>Obras Literarias</h2>
         <div id="books-obras-literarias"></div>
@@ -212,114 +249,38 @@
     </main>
   </div>
 
-  <!-- PIE DE PÁGINA -->
   <footer>
     <p>&copy; 2025 Biblioteca Online</p>
   </footer>
 
-  <!-- BIBLIOTECA FUSE.JS PARA BÚSQUEDA DIFUSA -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
 
-  <!-- SCRIPT PRINCIPAL -->
   <script>
-    // Datos de ejemplo
     const books = [
-      { 
-        title: "Cien Años de Soledad", 
-        author: "Gabriel García Márquez", 
-        category: "Obras Literarias", 
-        description: "Una obra maestra de la literatura latinoamericana."
-      },
-      { 
-        title: "La Casa de los Espíritus", 
-        author: "Isabel Allende", 
-        category: "Obras Literarias", 
-        description: "Una saga familiar llena de realismo mágico."
-      },
-      { 
-        title: "Naruto", 
-        author: "Masashi Kishimoto", 
-        category: "Mangas", 
-        description: "Historia de ninjas y aventuras."
-      },
-      { 
-        title: "One Piece", 
-        author: "Eiichiro Oda", 
-        category: "Mangas", 
-        description: "Aventuras en el mundo de los piratas."
-      },
-      { 
-        title: "Sword Art Online", 
-        author: "Reki Kawahara", 
-        category: "Novelas Ligeras", 
-        description: "Una novela ligera de realidad virtual y aventuras."
-      },
-      { 
-        title: "No Game No Life", 
-        author: "Yuu Kamiya", 
-        category: "Novelas Ligeras", 
-        description: "Hermanos en un mundo donde los juegos deciden el destino."
-      },
-      { 
-        title: "Introducción a la Física", 
-        author: "Juan Pérez", 
-        category: "Libros para la Universidad", 
-        description: "Conceptos fundamentales de la física."
-      },
-      { 
-        title: "Cálculo Infinitesimal", 
-        author: "María López", 
-        category: "Libros para la Universidad", 
-        description: "Una guía completa para el estudio del cálculo."
-      },
-      { 
-        title: "Revista de Literatura", 
-        author: "Ana Gómez", 
-        category: "Libros para Revistas", 
-        description: "Publicaciones y reseñas de obras literarias."
-      },
-      { 
-        title: "Moda y Diseño", 
-        author: "Carlos Ruiz", 
-        category: "Libros para Revistas", 
-        description: "Tendencias y análisis en el mundo del diseño."
-      },
-      { 
-        title: "Manual de Medicina", 
-        author: "Dr. Martínez", 
-        category: "Libros Médicos", 
-        description: "Referencia para estudiantes y profesionales de la medicina."
-      },
-      { 
-        title: "Avances en Cirugía", 
-        author: "Dr. González", 
-        category: "Libros Médicos", 
-        description: "Innovaciones y técnicas en el campo de la cirugía."
-      },
-      { 
-        title: "El Ensayo de la Vida", 
-        author: "Laura Jiménez", 
-        category: "Ensayos", 
-        description: "Reflexiones sobre la existencia y la sociedad."
-      },
-      { 
-        title: "Pensamientos y Reflexiones", 
-        author: "Pedro Sánchez", 
-        category: "Ensayos", 
-        description: "Ensayos que invitan a la reflexión."
-      }
+      { title: "Cien Años de Soledad", author: "Gabriel García Márquez", category: "Obras Literarias", description: "Una obra maestra de la literatura latinoamericana." },
+      { title: "La Casa de los Espíritus", author: "Isabel Allende", category: "Obras Literarias", description: "Una saga familiar llena de realismo mágico." },
+      { title: "Naruto", author: "Masashi Kishimoto", category: "Mangas", description: "Historia de ninjas y aventuras." },
+      { title: "One Piece", author: "Eiichiro Oda", category: "Mangas", description: "Aventuras en el mundo de los piratas." },
+      { title: "Sword Art Online", author: "Reki Kawahara", category: "Novelas Ligeras", description: "Una novela ligera de realidad virtual y aventuras." },
+      { title: "No Game No Life", author: "Yuu Kamiya", category: "Novelas Ligeras", description: "Hermanos en un mundo donde los juegos deciden el destino." },
+      { title: "Introducción a la Física", author: "Juan Pérez", category: "Libros para la Universidad", description: "Conceptos fundamentales de la física." },
+      { title: "Cálculo Infinitesimal", author: "María López", category: "Libros para la Universidad", description: "Una guía completa para el estudio del cálculo." },
+      { title: "Revista de Literatura", author: "Ana Gómez", category: "Libros para Revistas", description: "Publicaciones y reseñas de obras literarias." },
+      { title: "Moda y Diseño", author: "Carlos Ruiz", category: "Libros para Revistas", description: "Tendencias y análisis en el mundo del diseño." },
+      { title: "Manual de Medicina", author: "Dr. Martínez", category: "Libros Médicos", description: "Referencia para estudiantes y profesionales de la medicina." },
+      { title: "Avances en Cirugía", author: "Dr. González", category: "Libros Médicos", description: "Innovaciones y técnicas en el campo de la cirugía." },
+      { title: "El Ensayo de la Vida", author: "Laura Jiménez", category: "Ensayos", description: "Reflexiones sobre la existencia y la sociedad." },
+      { title: "Pensamientos y Reflexiones", author: "Pedro Sánchez", category: "Ensayos", description: "Ensayos que invitan a la reflexión." }
     ];
 
-    // Opciones de Fuse.js para búsqueda difusa
     const fuseOptions = {
       keys: ['title', 'author', 'description'],
       threshold: 0.4
     };
     const fuse = new Fuse(books, fuseOptions);
 
-    // Renderizar libros en las secciones correspondientes
     function renderBooks() {
-      // Mapeo de categoría -> id del contenedor
       const categoriesMap = {
         "Obras Literarias": "books-obras-literarias",
         "Mangas": "books-mangas",
@@ -330,12 +291,10 @@
         "Ensayos": "books-ensayos"
       };
 
-      // Limpiar contenedores
       Object.values(categoriesMap).forEach(id => {
         document.getElementById(id).innerHTML = "";
       });
 
-      // Rellenar contenedores
       books.forEach(book => {
         const containerId = categoriesMap[book.category];
         if (containerId) {
@@ -351,7 +310,6 @@
         }
       });
 
-      // Sección de autores (únicos)
       const authorsContainer = document.getElementById("books-autores");
       authorsContainer.innerHTML = "";
       const uniqueAuthors = {};
@@ -374,10 +332,8 @@
       }
     }
 
-    // Render inicial
     renderBooks();
 
-    // Manejo de la búsqueda en tiempo real
     const searchInput = document.getElementById("searchInput");
     const searchResultsSection = document.getElementById("searchResults");
     const resultsContainer = document.getElementById("resultsContainer");
@@ -410,8 +366,106 @@
         }
       }
     });
+
+    const toggleAdminBtn = document.getElementById("toggleAdminBtn");
+    const adminPanel = document.getElementById("adminPanel");
+
+    toggleAdminBtn.addEventListener("click", function() {
+      const pass = prompt("Ingrese la contraseña para acceder al Modo Creador:");
+      if (pass === "admin123") {
+        adminPanel.style.display = "flex";
+      } else {
+        alert("Contraseña incorrecta.");
+      }
+    });
+
+    document.getElementById("imageUpload").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if(file) {
+        const imagePreview = document.getElementById("imagePreview");
+        imagePreview.src = URL.createObjectURL(file);
+        imagePreview.onload = function() {
+          URL.revokeObjectURL(imagePreview.src);
+        }
+      }
+    });
+
+    document.getElementById("pdfUpload").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if(file && file.type === "application/pdf") {
+        const pdfContainer = document.getElementById("pdfContainer");
+        pdfContainer.innerHTML = `<embed src="${URL.createObjectURL(file)}" type="application/pdf" width="100%" height="500px" />`;
+      }
+    });
+
+    document.getElementById("epubUpload").addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if(file && file.name.endsWith(".epub")) {
+        const epubContainer = document.getElementById("epubContainer");
+        const url = URL.createObjectURL(file);
+        epubContainer.innerHTML = "";
+        var book = ePub(url);
+        var rendition = book.renderTo("epubContainer", {width: "100%", height: 500});
+        rendition.display();
+      }
+    });
+
+    document.getElementById("createTabBtn").addEventListener("click", function() {
+      const title = document.getElementById("newTabTitle").value.trim();
+      const content = document.getElementById("newTabContent").value.trim();
+      if(title === "" || content === ""){
+        alert("Por favor, ingrese título y contenido.");
+        return;
+      }
+      const newId = "custom-tab-" + Date.now();
+
+      const navList = document.getElementById("navList");
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="#${newId}">${title}</a>`;
+      navList.appendChild(li);
+
+      const mainContent = document.getElementById("mainContent");
+      const section = document.createElement("section");
+      section.id = newId;
+      section.innerHTML = `<h2>${title}</h2><p>${content}</p>`;
+      mainContent.appendChild(section);
+
+      document.getElementById("newTabTitle").value = "";
+      document.getElementById("newTabContent").value = "";
+      alert("Nueva pestaña creada exitosamente.");
+    });
   </script>
+
+  <div id="adminPanel">
+    <div class="admin-content">
+      <button id="closeAdminBtn" onclick="document.getElementById('adminPanel').style.display='none'">Cerrar</button>
+      <h2>Panel de Administrador</h2>
+      
+      <div class="admin-section">
+        <h3>Subida de Imágenes</h3>
+        <input type="file" id="imageUpload" accept="image/*">
+        <img id="imagePreview" alt="Vista previa de imagen" style="max-width: 100%; margin-top: 10px;">
+      </div>
+      
+      <div class="admin-section">
+        <h3>Visualización de PDF</h3>
+        <input type="file" id="pdfUpload" accept="application/pdf">
+        <div id="pdfContainer" style="margin-top:10px;"></div>
+      </div>
+      
+      <div class="admin-section">
+        <h3>Visualización de EPUB</h3>
+        <input type="file" id="epubUpload" accept=".epub">
+        <div id="epubContainer" style="margin-top:10px; border:1px solid #ccc;"></div>
+      </div>
+      
+      <div class="admin-section">
+        <h3>Crear Nueva Pestaña</h3>
+        <input type="text" id="newTabTitle" placeholder="Título de la pestaña">
+        <textarea id="newTabContent" placeholder="Contenido de la pestaña"></textarea>
+        <button id="createTabBtn">Crear Pestaña</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
-
-
