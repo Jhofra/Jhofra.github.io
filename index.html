@@ -7,6 +7,7 @@
     body {
       margin: 0;
       font-family: 'Helvetica Now', Helvetica, Arial, sans-serif;
+      background-color: #f8f8f8;
     }
     header {
       background-color: #f0f0f0;
@@ -72,12 +73,85 @@
     #librosContent section.active {
       display: block;
     }
+
+    /* --- Estilos para las cuadrículas (grid) de ítems --- */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .item-card {
+      background-color: #fff;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .item-card:hover {
+      transform: scale(1.03);
+    }
+    .item-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .item-card .item-title {
+      padding: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #333;
+    }
+    .item-card .item-title:hover {
+      text-decoration: underline;
+    }
+
+    /* Formulario para agregar ítems */
+    .add-item-form {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+    }
+    .add-item-form h2 {
+      margin-top: 0;
+    }
+    .add-item-form label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .add-item-form input,
+    .add-item-form select,
+    .add-item-form button {
+      margin-top: 5px;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .add-item-form button {
+      background-color: #4285F4;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .add-item-form button:hover {
+      background-color: #3367D6;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Camarón Que Se Duerme</h1>
   </header>
+
+  <!-- Barra de navegación principal -->
   <div class="nav-container">
     <div class="nav-item" data-target="pageInicio">Inicio</div>
     <div class="nav-item" data-target="pageLibros">Libros</div>
@@ -86,6 +160,7 @@
     <input type="text" id="searchInput" placeholder="Buscar...">
   </div>
   
+  <!-- Contenedor de páginas -->
   <div id="pages">
     <!-- Página de Inicio -->
     <section id="pageInicio" class="active">
@@ -104,15 +179,18 @@
       <div id="librosContent">
         <section id="pageLibrosUniversitarios" class="active">
           <h3>Libros Universitarios</h3>
-          <p>Contenido de Libros Universitarios.</p>
+          <!-- Grid de ítems para Universitarios -->
+          <div class="items-grid" id="universitariosGrid"></div>
         </section>
         <section id="pageLibrosObras">
           <h3>Obras Clásicas</h3>
-          <p>Contenido de Obras Clásicas.</p>
+          <!-- Grid de ítems para Obras Clásicas -->
+          <div class="items-grid" id="obrasGrid"></div>
         </section>
         <section id="pageLibrosMedicina">
           <h3>Libros de Medicina</h3>
-          <p>Contenido de Libros de Medicina.</p>
+          <!-- Grid de ítems para Libros de Medicina -->
+          <div class="items-grid" id="medicinaGrid"></div>
         </section>
       </div>
     </section>
@@ -120,13 +198,15 @@
     <!-- Página de Mangas -->
     <section id="pageMangas">
       <h2>Mangas</h2>
-      <p>Contenido de la página de Mangas.</p>
+      <!-- Grid de ítems para Mangas -->
+      <div class="items-grid" id="mangasGrid"></div>
     </section>
     
     <!-- Página de Novelas Ligeras -->
     <section id="pageNovelas">
       <h2>Novelas Ligeras</h2>
-      <p>Contenido de la página de Novelas Ligeras.</p>
+      <!-- Grid de ítems para Novelas Ligeras -->
+      <div class="items-grid" id="novelasGrid"></div>
     </section>
     
     <!-- Página de Resultados de Búsqueda -->
@@ -136,10 +216,35 @@
     </section>
   </div>
   
+  <!-- Formulario para agregar nuevo item (libro, manga o novela) -->
+  <form class="add-item-form" id="addItemForm">
+    <h2>Agregar nuevo</h2>
+    <label for="itemImage">Portada (Imagen)</label>
+    <input type="file" id="itemImage" accept="image/*" required>
+    
+    <label for="itemTitle">Título</label>
+    <input type="text" id="itemTitle" placeholder="Ej. Boruto: Two Blue Vortex" required>
+    
+    <label for="itemLink">Enlace (URL o archivo)</label>
+    <input type="text" id="itemLink" placeholder="Ej. https://miarchivo.pdf" required>
+    
+    <label for="itemCategory">Categoría</label>
+    <select id="itemCategory" required>
+      <option value="">-- Selecciona --</option>
+      <option value="libros-universitarios">Libros Universitarios</option>
+      <option value="libros-obras">Libros Obras Clásicas</option>
+      <option value="libros-medicina">Libros de Medicina</option>
+      <option value="mangas">Mangas</option>
+      <option value="novelas">Novelas Ligeras</option>
+    </select>
+    
+    <button type="submit">Agregar</button>
+  </form>
+
   <!-- Se incluye Fuse.js para la búsqueda difusa -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <script>
-    // Función para mostrar una sección y ocultar las demás
+    /********** NAVEGACIÓN Y SUBNAVEGACIÓN **********/
     function showPage(pageId) {
       document.querySelectorAll('#pages section').forEach(section => {
         section.classList.remove('active');
@@ -147,21 +252,18 @@
       document.getElementById(pageId).classList.add('active');
     }
     
-    // Manejo de clics en la navegación principal
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', function() {
         const target = this.getAttribute('data-target');
         if (target === 'pageLibros') {
-          // Al entrar a Libros, mostramos por defecto la sub-sección Universitarios
           showPage(target);
-          showLibrosSubPage('pageLibrosUniversitarios');
+          showLibrosSubPage('pageLibrosUniversitarios'); // Por defecto
         } else {
           showPage(target);
         }
       });
     });
     
-    // Función para mostrar la subpágina dentro de Libros
     function showLibrosSubPage(subPageId) {
       document.querySelectorAll('#librosContent section').forEach(section => {
         section.classList.remove('active');
@@ -169,7 +271,6 @@
       document.getElementById(subPageId).classList.add('active');
     }
     
-    // Manejo de clics en la subnavegación de Libros
     document.querySelectorAll('.subnav-item').forEach(item => {
       item.addEventListener('click', function() {
         const target = this.getAttribute('data-target');
@@ -177,7 +278,8 @@
       });
     });
     
-    // Datos para la búsqueda (cada objeto representa el contenido de una "página")
+    /********** BÚSQUEDA CON FUSE.JS **********/
+    // Datos para la búsqueda (cada objeto representa la "página" o sección principal)
     const pagesData = [
       { id: 'pageInicio', title: 'Inicio', content: 'Bienvenido a Camarón Que Se Duerme. Esta es la página de inicio.' },
       { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.' },
@@ -187,13 +289,11 @@
       { id: 'pageNovelas', title: 'Novelas Ligeras', content: 'Contenido de la página de Novelas Ligeras.' }
     ];
     
-    // Configuración de Fuse.js
     const fuse = new Fuse(pagesData, {
       keys: ['title', 'content'],
       threshold: 0.4
     });
     
-    // Función para realizar la búsqueda y mostrar resultados
     function doSearch(query) {
       const results = fuse.search(query);
       const resultsContainer = document.getElementById('searchResults');
@@ -208,9 +308,10 @@
           item.style.margin = '5px';
           item.style.cursor = 'pointer';
           item.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
+          
           item.addEventListener('click', function() {
-            // Si el resultado pertenece a una subpágina de Libros, mostramos la página Libros y la subpágina correspondiente
-            if (result.item.id === 'pageLibrosUniversitarios' || result.item.id === 'pageLibrosObras' || result.item.id === 'pageLibrosMedicina') {
+            // Verificamos si pertenece a una subpágina de Libros
+            if (['pageLibrosUniversitarios','pageLibrosObras','pageLibrosMedicina'].includes(result.item.id)) {
               showPage('pageLibros');
               showLibrosSubPage(result.item.id);
             } else {
@@ -223,12 +324,77 @@
       showPage('pageSearch');
     }
     
-    // Manejar el evento de búsqueda en el input
     document.getElementById('searchInput').addEventListener('input', function() {
       const query = this.value.trim();
       if (query.length > 0) {
         doSearch(query);
       }
+    });
+
+    /********** AGREGAR NUEVOS ÍTEMS (IMÁGEN, TÍTULO, ENLACE) **********/
+    const addItemForm = document.getElementById('addItemForm');
+    const itemImageInput = document.getElementById('itemImage');
+    const itemTitleInput = document.getElementById('itemTitle');
+    const itemLinkInput = document.getElementById('itemLink');
+    const itemCategorySelect = document.getElementById('itemCategory');
+    
+    // Referencias a las cuadrículas
+    const universitariosGrid = document.getElementById('universitariosGrid');
+    const obrasGrid = document.getElementById('obrasGrid');
+    const medicinaGrid = document.getElementById('medicinaGrid');
+    const mangasGrid = document.getElementById('mangasGrid');
+    const novelasGrid = document.getElementById('novelasGrid');
+    
+    addItemForm.addEventListener('submit', function(event) {
+      event.preventDefault(); // Evita recargar la página
+      
+      const file = itemImageInput.files[0];
+      const title = itemTitleInput.value.trim();
+      const link = itemLinkInput.value.trim();
+      const category = itemCategorySelect.value;
+      
+      if (!file || !title || !link || !category) {
+        alert('Por favor, completa todos los campos.');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageDataUrl = e.target.result;
+        
+        // Crear la tarjeta
+        const card = document.createElement('div');
+        card.classList.add('item-card');
+        card.innerHTML = `
+          <a href="${link}" target="_blank">
+            <img src="${imageDataUrl}" alt="${title}">
+            <p class="item-title">${title}</p>
+          </a>
+        `;
+        
+        // Insertar en la cuadrícula según la categoría
+        switch (category) {
+          case 'libros-universitarios':
+            universitariosGrid.appendChild(card);
+            break;
+          case 'libros-obras':
+            obrasGrid.appendChild(card);
+            break;
+          case 'libros-medicina':
+            medicinaGrid.appendChild(card);
+            break;
+          case 'mangas':
+            mangasGrid.appendChild(card);
+            break;
+          case 'novelas':
+            novelasGrid.appendChild(card);
+            break;
+        }
+        
+        // Limpiar formulario
+        addItemForm.reset();
+      };
+      reader.readAsDataURL(file);
     });
   </script>
 </body>
