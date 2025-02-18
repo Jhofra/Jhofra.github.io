@@ -88,6 +88,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       text-align: center;
       transition: transform 0.2s ease;
+      position: relative; /* Para posicionar botón de eliminar */
     }
     .item-card:hover {
       transform: scale(1.03);
@@ -106,9 +107,26 @@
     .item-card .item-title:hover {
       text-decoration: underline;
     }
+    /* Botón de eliminar */
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: #d9534f;
+      color: #fff;
+      border: none;
+      padding: 5px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .delete-btn:hover {
+      background-color: #c9302c;
+    }
 
     /* Formulario para agregar ítems */
     .add-item-form {
+      display: none; /* Oculto por defecto, se muestra al hacer clic en "Agregar" */
       background-color: #fff;
       padding: 15px;
       border-radius: 5px;
@@ -157,6 +175,7 @@
     <div class="nav-item" data-target="pageLibros">Libros</div>
     <div class="nav-item" data-target="pageMangas">Mangas</div>
     <div class="nav-item" data-target="pageNovelas">Novelas Ligeras</div>
+    <div class="nav-item" data-target="toggleForm">Agregar</div>
     <input type="text" id="searchInput" placeholder="Buscar...">
   </div>
   
@@ -244,7 +263,9 @@
   <!-- Se incluye Fuse.js para la búsqueda difusa -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <script>
-    /********** NAVEGACIÓN Y SUBNAVEGACIÓN **********/
+    /***************************************************
+     * 1. NAVEGACIÓN Y SUBNAVEGACIÓN
+     **************************************************/
     function showPage(pageId) {
       document.querySelectorAll('#pages section').forEach(section => {
         section.classList.remove('active');
@@ -252,18 +273,28 @@
       document.getElementById(pageId).classList.add('active');
     }
     
+    // Manejo de clics en la barra de navegación
     document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', function() {
         const target = this.getAttribute('data-target');
         if (target === 'pageLibros') {
           showPage(target);
           showLibrosSubPage('pageLibrosUniversitarios'); // Por defecto
+        } else if (target === 'toggleForm') {
+          // Mostrar/ocultar formulario
+          const form = document.getElementById('addItemForm');
+          if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+          } else {
+            form.style.display = 'none';
+          }
         } else {
           showPage(target);
         }
       });
     });
     
+    // Subnavegación en "Libros"
     function showLibrosSubPage(subPageId) {
       document.querySelectorAll('#librosContent section').forEach(section => {
         section.classList.remove('active');
@@ -277,8 +308,10 @@
         showLibrosSubPage(target);
       });
     });
-    
-    /********** BÚSQUEDA CON FUSE.JS **********/
+
+    /***************************************************
+     * 2. BÚSQUEDA CON FUSE.JS (Secciones principales)
+     **************************************************/
     // Datos para la búsqueda (cada objeto representa la "página" o sección principal)
     const pagesData = [
       { id: 'pageInicio', title: 'Inicio', content: 'Bienvenido a Camarón Que Se Duerme. Esta es la página de inicio.' },
@@ -331,19 +364,87 @@
       }
     });
 
-    /********** AGREGAR NUEVOS ÍTEMS (IMÁGEN, TÍTULO, ENLACE) **********/
+    /***************************************************
+     * 3. PERSISTENCIA DE ÍTEMS (Libros/Mangas/Novelas)
+     *    Se guardan en localStorage
+     **************************************************/
+    // Estructura de cada ítem:
+    // { id, imageDataUrl, title, link, category }
+
+    let items = JSON.parse(localStorage.getItem('items')) || [];
+
+    // Guardar en localStorage
+    function saveItems() {
+      localStorage.setItem('items', JSON.stringify(items));
+    }
+
+    // Renderizar ítems en cada grid según categoría
+    function renderItems() {
+      // Primero limpiamos cada contenedor
+      document.getElementById('universitariosGrid').innerHTML = '';
+      document.getElementById('obrasGrid').innerHTML = '';
+      document.getElementById('medicinaGrid').innerHTML = '';
+      document.getElementById('mangasGrid').innerHTML = '';
+      document.getElementById('novelasGrid').innerHTML = '';
+      
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.classList.add('item-card');
+        card.innerHTML = `
+          <a href="${item.link}" target="_blank">
+            <img src="${item.imageDataUrl}" alt="${item.title}">
+            <p class="item-title">${item.title}</p>
+          </a>
+          <button class="delete-btn" data-id="${item.id}">Eliminar</button>
+        `;
+        
+        // Insertar según categoría
+        switch (item.category) {
+          case 'libros-universitarios':
+            document.getElementById('universitariosGrid').appendChild(card);
+            break;
+          case 'libros-obras':
+            document.getElementById('obrasGrid').appendChild(card);
+            break;
+          case 'libros-medicina':
+            document.getElementById('medicinaGrid').appendChild(card);
+            break;
+          case 'mangas':
+            document.getElementById('mangasGrid').appendChild(card);
+            break;
+          case 'novelas':
+            document.getElementById('novelasGrid').appendChild(card);
+            break;
+        }
+      });
+      
+      // Botones de eliminar
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const idToDelete = e.target.getAttribute('data-id');
+          deleteItem(idToDelete);
+        });
+      });
+    }
+
+    // Eliminar ítem por id
+    function deleteItem(id) {
+      items = items.filter(item => item.id !== id);
+      saveItems();
+      renderItems();
+    }
+
+    // Al cargar la página, renderizamos lo que haya en localStorage
+    renderItems();
+
+    /***************************************************
+     * 4. AGREGAR NUEVO ÍTEM (formulario)
+     **************************************************/
     const addItemForm = document.getElementById('addItemForm');
     const itemImageInput = document.getElementById('itemImage');
     const itemTitleInput = document.getElementById('itemTitle');
     const itemLinkInput = document.getElementById('itemLink');
     const itemCategorySelect = document.getElementById('itemCategory');
-    
-    // Referencias a las cuadrículas
-    const universitariosGrid = document.getElementById('universitariosGrid');
-    const obrasGrid = document.getElementById('obrasGrid');
-    const medicinaGrid = document.getElementById('medicinaGrid');
-    const mangasGrid = document.getElementById('mangasGrid');
-    const novelasGrid = document.getElementById('novelasGrid');
     
     addItemForm.addEventListener('submit', function(event) {
       event.preventDefault(); // Evita recargar la página
@@ -362,37 +463,26 @@
       reader.onload = function(e) {
         const imageDataUrl = e.target.result;
         
-        // Crear la tarjeta
-        const card = document.createElement('div');
-        card.classList.add('item-card');
-        card.innerHTML = `
-          <a href="${link}" target="_blank">
-            <img src="${imageDataUrl}" alt="${title}">
-            <p class="item-title">${title}</p>
-          </a>
-        `;
+        // Crear un id único
+        const newId = 'item-' + Date.now();
         
-        // Insertar en la cuadrícula según la categoría
-        switch (category) {
-          case 'libros-universitarios':
-            universitariosGrid.appendChild(card);
-            break;
-          case 'libros-obras':
-            obrasGrid.appendChild(card);
-            break;
-          case 'libros-medicina':
-            medicinaGrid.appendChild(card);
-            break;
-          case 'mangas':
-            mangasGrid.appendChild(card);
-            break;
-          case 'novelas':
-            novelasGrid.appendChild(card);
-            break;
-        }
+        // Crear objeto y agregarlo al array
+        const newItem = {
+          id: newId,
+          imageDataUrl,
+          title,
+          link,
+          category
+        };
+        items.push(newItem);
         
-        // Limpiar formulario
+        // Guardar y renderizar
+        saveItems();
+        renderItems();
+        
+        // Limpiar formulario y ocultarlo
         addItemForm.reset();
+        addItemForm.style.display = 'none';
       };
       reader.readAsDataURL(file);
     });
