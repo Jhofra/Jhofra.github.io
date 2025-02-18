@@ -6,7 +6,6 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
       font-family: 'Helvetica Now', Helvetica, Arial, sans-serif;
     }
     header {
@@ -21,7 +20,9 @@
     .nav-container {
       display: flex;
       justify-content: center;
-      margin-top: 10px;
+      align-items: center;
+      background-color: #ddd;
+      padding: 10px;
     }
     .nav-item {
       background-color: #fff;
@@ -29,23 +30,206 @@
       padding: 10px 20px;
       margin: 0 5px;
       cursor: pointer;
-      font-size: 1em;
     }
     .nav-item:hover {
       background-color: #e0e0e0;
+    }
+    #searchInput {
+      margin-left: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      flex-grow: 1;
+      max-width: 200px;
+    }
+    /* Secciones principales */
+    #pages section {
+      display: none;
+      padding: 20px;
+    }
+    #pages section.active {
+      display: block;
+    }
+    /* Subnavegación para Libros */
+    .subnav {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .subnav-item {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 8px 16px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    .subnav-item:hover {
+      background-color: #e0e0e0;
+    }
+    #librosContent section {
+      display: none;
+    }
+    #librosContent section.active {
+      display: block;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Camarón Que Se Duerme</h1>
-    <div class="nav-container">
-      <div class="nav-item">Inicio</div>
-      <div class="nav-item">Libros</div>
-      <div class="nav-item">Mangas</div>
-      <div class="nav-item">Novelas Ligeras</div>
-      <div class="nav-item">Buscador</div>
-    </div>
   </header>
+  <div class="nav-container">
+    <div class="nav-item" data-target="pageInicio">Inicio</div>
+    <div class="nav-item" data-target="pageLibros">Libros</div>
+    <div class="nav-item" data-target="pageMangas">Mangas</div>
+    <div class="nav-item" data-target="pageNovelas">Novelas Ligeras</div>
+    <input type="text" id="searchInput" placeholder="Buscar...">
+  </div>
+  
+  <div id="pages">
+    <!-- Página de Inicio -->
+    <section id="pageInicio" class="active">
+      <h2>Página de Inicio</h2>
+      <p>Bienvenido a Camarón Que Se Duerme.</p>
+    </section>
+    
+    <!-- Página de Libros -->
+    <section id="pageLibros">
+      <h2>Libros</h2>
+      <div class="subnav">
+        <div class="subnav-item" data-target="pageLibrosUniversitarios">Universitarios</div>
+        <div class="subnav-item" data-target="pageLibrosObras">Obras Clásicas</div>
+        <div class="subnav-item" data-target="pageLibrosMedicina">Libros de Medicina</div>
+      </div>
+      <div id="librosContent">
+        <section id="pageLibrosUniversitarios" class="active">
+          <h3>Libros Universitarios</h3>
+          <p>Contenido de Libros Universitarios.</p>
+        </section>
+        <section id="pageLibrosObras">
+          <h3>Obras Clásicas</h3>
+          <p>Contenido de Obras Clásicas.</p>
+        </section>
+        <section id="pageLibrosMedicina">
+          <h3>Libros de Medicina</h3>
+          <p>Contenido de Libros de Medicina.</p>
+        </section>
+      </div>
+    </section>
+    
+    <!-- Página de Mangas -->
+    <section id="pageMangas">
+      <h2>Mangas</h2>
+      <p>Contenido de la página de Mangas.</p>
+    </section>
+    
+    <!-- Página de Novelas Ligeras -->
+    <section id="pageNovelas">
+      <h2>Novelas Ligeras</h2>
+      <p>Contenido de la página de Novelas Ligeras.</p>
+    </section>
+    
+    <!-- Página de Resultados de Búsqueda -->
+    <section id="pageSearch">
+      <h2>Resultados de Búsqueda</h2>
+      <div id="searchResults"></div>
+    </section>
+  </div>
+  
+  <!-- Se incluye Fuse.js para la búsqueda difusa -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+  <script>
+    // Función para mostrar una sección y ocultar las demás
+    function showPage(pageId) {
+      document.querySelectorAll('#pages section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(pageId).classList.add('active');
+    }
+    
+    // Manejo de clics en la navegación principal
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        if (target === 'pageLibros') {
+          // Al entrar a Libros, mostramos por defecto la sub-sección Universitarios
+          showPage(target);
+          showLibrosSubPage('pageLibrosUniversitarios');
+        } else {
+          showPage(target);
+        }
+      });
+    });
+    
+    // Función para mostrar la subpágina dentro de Libros
+    function showLibrosSubPage(subPageId) {
+      document.querySelectorAll('#librosContent section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(subPageId).classList.add('active');
+    }
+    
+    // Manejo de clics en la subnavegación de Libros
+    document.querySelectorAll('.subnav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const target = this.getAttribute('data-target');
+        showLibrosSubPage(target);
+      });
+    });
+    
+    // Datos para la búsqueda (cada objeto representa el contenido de una "página")
+    const pagesData = [
+      { id: 'pageInicio', title: 'Inicio', content: 'Bienvenido a Camarón Que Se Duerme. Esta es la página de inicio.' },
+      { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.' },
+      { id: 'pageLibrosObras', title: 'Obras Clásicas', content: 'Contenido de Obras Clásicas.' },
+      { id: 'pageLibrosMedicina', title: 'Libros de Medicina', content: 'Contenido de Libros de Medicina.' },
+      { id: 'pageMangas', title: 'Mangas', content: 'Contenido de la página de Mangas.' },
+      { id: 'pageNovelas', title: 'Novelas Ligeras', content: 'Contenido de la página de Novelas Ligeras.' }
+    ];
+    
+    // Configuración de Fuse.js
+    const fuse = new Fuse(pagesData, {
+      keys: ['title', 'content'],
+      threshold: 0.4
+    });
+    
+    // Función para realizar la búsqueda y mostrar resultados
+    function doSearch(query) {
+      const results = fuse.search(query);
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.innerHTML = '';
+      if (results.length === 0) {
+        resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
+      } else {
+        results.forEach(result => {
+          const item = document.createElement('div');
+          item.style.border = '1px solid #ccc';
+          item.style.padding = '10px';
+          item.style.margin = '5px';
+          item.style.cursor = 'pointer';
+          item.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
+          item.addEventListener('click', function() {
+            // Si el resultado pertenece a una subpágina de Libros, mostramos la página Libros y la subpágina correspondiente
+            if (result.item.id === 'pageLibrosUniversitarios' || result.item.id === 'pageLibrosObras' || result.item.id === 'pageLibrosMedicina') {
+              showPage('pageLibros');
+              showLibrosSubPage(result.item.id);
+            } else {
+              showPage(result.item.id);
+            }
+          });
+          resultsContainer.appendChild(item);
+        });
+      }
+      showPage('pageSearch');
+    }
+    
+    // Manejar el evento de búsqueda en el input
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const query = this.value.trim();
+      if (query.length > 0) {
+        doSearch(query);
+      }
+    });
+  </script>
 </body>
 </html>
