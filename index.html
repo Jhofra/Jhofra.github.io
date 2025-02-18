@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Publicación de Libros y Obras</title>
+  <style>
+    /* Estilos básicos */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    header {
+      background-color: #4285F4;
+      color: #fff;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+    }
+    header label {
+      font-weight: bold;
+    }
+    header input[type="text"] {
+      margin-left: 10px;
+      padding: 5px;
+      border: none;
+      border-radius: 3px;
+    }
+    #container {
+      display: flex;
+    }
+    aside {
+      width: 200px;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+    aside ul {
+      list-style: none;
+      padding: 0;
+    }
+    aside ul li {
+      margin-bottom: 10px;
+    }
+    aside ul li a {
+      text-decoration: none;
+      color: #4285F4;
+    }
+    main {
+      flex: 1;
+      padding: 20px;
+    }
+    section {
+      margin-bottom: 40px;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    section h2 {
+      border-bottom: 2px solid #4285F4;
+      padding-bottom: 5px;
+    }
+    .book {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .book:last-child {
+      border-bottom: none;
+    }
+    .search-result {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .search-result:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Encabezado con barra de búsqueda -->
+  <header>
+    <label for="searchInput">Búsqueda:</label>
+    <input type="text" id="searchInput" placeholder="Buscar libros o autores...">
+  </header>
+
+  <div id="container">
+    <!-- Menú lateral con enlaces a las secciones -->
+    <aside>
+      <ul>
+        <li><a href="#obras-literarias">Obras Literarias</a></li>
+        <li><a href="#mangas">Mangas</a></li>
+        <li><a href="#novelas-ligeras">Novelas Ligeras</a></li>
+        <li><a href="#universidad">Libros para la Universidad</a></li>
+        <li><a href="#revistas">Libros para Revistas</a></li>
+        <li><a href="#medicos">Libros Médicos</a></li>
+        <li><a href="#ensayos">Ensayos</a></li>
+        <li><a href="#autores">Autores</a></li>
+      </ul>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main>
+      <!-- Sección de resultados de búsqueda (se muestra al ingresar texto) -->
+      <section id="searchResults" style="display:none;">
+        <h2>Resultados de Búsqueda</h2>
+        <div id="resultsContainer"></div>
+      </section>
+
+      <!-- Secciones por categoría -->
+      <section id="obras-literarias">
+        <h2>Obras Literarias</h2>
+        <div class="books" id="books-obras-literarias"></div>
+      </section>
+
+      <section id="mangas">
+        <h2>Mangas</h2>
+        <div class="books" id="books-mangas"></div>
+      </section>
+
+      <section id="novelas-ligeras">
+        <h2>Novelas Ligeras</h2>
+        <div class="books" id="books-novelas-ligeras"></div>
+      </section>
+
+      <section id="universidad">
+        <h2>Libros para la Universidad</h2>
+        <div class="books" id="books-universidad"></div>
+      </section>
+
+      <section id="revistas">
+        <h2>Libros para Revistas</h2>
+        <div class="books" id="books-revistas"></div>
+      </section>
+
+      <section id="medicos">
+        <h2>Libros Médicos</h2>
+        <div class="books" id="books-medicos"></div>
+      </section>
+
+      <section id="ensayos">
+        <h2>Ensayos</h2>
+        <div class="books" id="books-ensayos"></div>
+      </section>
+
+      <section id="autores">
+        <h2>Autores</h2>
+        <div class="books" id="books-autores"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Incluir Fuse.js para la búsqueda difusa -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+  <script>
+    // Datos de ejemplo para los libros
+    const books = [
+      { title: "Cien Años de Soledad", author: "Gabriel García Márquez", category: "Obras Literarias", description: "Una obra maestra de la literatura latinoamericana." },
+      { title: "La Casa de los Espíritus", author: "Isabel Allende", category: "Obras Literarias", description: "Una saga familiar llena de realismo mágico." },
+      { title: "Naruto", author: "Masashi Kishimoto", category: "Mangas", description: "Historia de ninjas y aventuras." },
+      { title: "One Piece", author: "Eiichiro Oda", category: "Mangas", description: "Aventuras en el mundo de los piratas." },
+      { title: "Sword Art Online", author: "Reki Kawahara", category: "Novelas Ligeras", description: "Una novela ligera de realidad virtual y aventuras." },
+      { title: "No Game No Life", author: "Yuu Kamiya", category: "Novelas Ligeras", description: "Hermanos en un mundo donde los juegos deciden el destino." },
+      { title: "Introducción a la Física", author: "Juan Pérez", category: "Libros para la Universidad", description: "Conceptos fundamentales de la física explicados de forma clara." },
+      { title: "Cálculo Infinitesimal", author: "María López", category: "Libros para la Universidad", description: "Una guía completa para el estudio del cálculo." },
+      { title: "Revista de Literatura", author: "Ana Gómez", category: "Libros para Revistas", description: "Publicaciones y reseñas de obras literarias." },
+      { title: "Moda y Diseño", author: "Carlos Ruiz", category: "Libros para Revistas", description: "Tendencias y análisis en el mundo del diseño." },
+      { title: "Manual de Medicina", author: "Dr. Martínez", category: "Libros Médicos", description: "Referencia para estudiantes y profesionales de la medicina." },
+      { title: "Avances en Cirugía", author: "Dr. González", category: "Libros Médicos", description: "Innovaciones y técnicas en el campo de la cirugía." },
+      { title: "El Ensayo de la Vida", author: "Laura Jiménez", category: "Ensayos", description: "Reflexiones sobre la existencia y la sociedad." },
+      { title: "Pensamientos y Reflexiones", author: "Pedro Sánchez", category: "Ensayos", description: "Ensayos que invitan a la reflexión sobre diversos temas." }
+    ];
+
+    // Inicializar Fuse.js para búsqueda difusa en los campos título, autor y descripción
+    const fuseOptions = {
+      keys: ['title', 'author', 'description'],
+      threshold: 0.4  // Ajusta este valor según la similitud que necesites
+    };
+    const fuse = new Fuse(books, fuseOptions);
+
+    // Función para renderizar los libros en sus respectivas secciones según categoría
+    function renderBooks() {
+      // Definir el mapeo de categorías con el id del contenedor correspondiente
+      const categories = {
+        "Obras Literarias": "books-obras-literarias",
+        "Mangas": "books-mangas",
+        "Novelas Ligeras": "books-novelas-ligeras",
+        "Libros para la Universidad": "books-universidad",
+        "Libros para Revistas": "books-revistas",
+        "Libros Médicos": "books-medicos",
+        "Ensayos": "books-ensayos"
+      };
+
+      // Limpiar cada sección
+      Object.values(categories).forEach(id => {
+        document.getElementById(id).innerHTML = "";
+      });
+
+      // Agregar cada libro a la sección correspondiente
+      books.forEach(book => {
+        if (categories[book.category]) {
+          const container = document.getElementById(categories[book.category]);
+          const div = document.createElement("div");
+          div.className = "book";
+          div.innerHTML = `<h3>${book.title}</h3>
+                           <p><strong>Autor:</strong> ${book.author}</p>
+                           <p>${book.description}</p>`;
+          container.appendChild(div);
+        }
+      });
+
+      // Renderizar la sección de Autores (únicos) a partir de los libros
+      const authorsContainer = document.getElementById("books-autores");
+      // Obtener autores únicos y agrupar sus obras
+      const uniqueAuthors = {};
+      books.forEach(book => {
+        if (!uniqueAuthors[book.author]) {
+          uniqueAuthors[book.author] = [];
+        }
+        uniqueAuthors[book.author].push(book.title);
+      });
+      authorsContainer.innerHTML = "";
+      for (const author in uniqueAuthors) {
+        const div = document.createElement("div");
+        div.className = "book";
+        div.innerHTML = `<h3>${author}</h3>
+                         <p><strong>Obras:</strong> ${uniqueAuthors[author].join(", ")}</p>`;
+        authorsContainer.appendChild(div);
+      }
+    }
+
+    // Ejecutar el renderizado inicial
+    renderBooks();
+
+    // Manejar la búsqueda en tiempo real
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+      const query = e.target.value.trim();
+      const searchResultsSection = document.getElementById("searchResults");
+      const resultsContainer = document.getElementById("resultsContainer");
+      resultsContainer.innerHTML = "";
+
+      if (query === "") {
+        // Si no hay texto, ocultar resultados y mostrar el contenido normal
+        searchResultsSection.style.display = "none";
+      } else {
+        // Mostrar la sección de resultados
+        searchResultsSection.style.display = "block";
+        // Realizar la búsqueda difusa
+        const results = fuse.search(query);
+        if (results.length > 0) {
+          results.forEach(result => {
+            const book = result.item;
+            const div = document.createElement("div");
+            div.className = "search-result";
+            div.innerHTML = `<h3>${book.title}</h3>
+                             <p><strong>Autor:</strong> ${book.author}</p>
+                             <p><em>${book.category}</em></p>
+                             <p>${book.description}</p>`;
+            resultsContainer.appendChild(div);
+          });
+        } else {
+          resultsContainer.innerHTML = "<p>No se encontraron resultados.</p>";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+
