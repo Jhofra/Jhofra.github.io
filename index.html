@@ -18,11 +18,34 @@
       font-size: 2.5em;
       margin: 0;
     }
+    .nav-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .nav-item {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .nav-item:hover {
+      background-color: #e0e0e0;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Camarón Que Se Duerme</h1>
+    <div class="nav-container">
+      <div class="nav-item">Inicio</div>
+      <div class="nav-item">Libros</div>
+      <div class="nav-item">Mangas</div>
+      <div class="nav-item">Novelas Ligeras</div>
+      <div class="nav-item">Buscador</div>
+    </div>
   </header>
 </body>
 </html>
