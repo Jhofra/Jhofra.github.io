@@ -24,17 +24,7 @@
       color: #fff;
       padding: 10px;
       position: relative;
-      justify-content: space-between;
-    }
-    header .logo-images {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    header .logo-images img {
-      max-width: 120px;
-      height: auto;
-      border-radius: 4px;
+      justify-content: center;
     }
     /* BARRA DE BÚSQUEDA */
     .search-container {
@@ -50,16 +40,6 @@
       border: none;
       outline: none;
       padding: 5px;
-    }
-    /* BOTÓN DE ADMINISTRADOR */
-    #toggleAdminBtn {
-      background: #fff;
-      color: #4285F4;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
     }
     /* MENÚ LATERAL (NAV) */
     nav {
@@ -175,19 +155,14 @@
 
   <!-- ENCABEZADO -->
   <header>
-    <div class="logo-images">
-      <img src="https://raw.githubusercontent.com/Jhofra/Camaron-que-se-duerme/main/camaron1.jpg" alt="Camarón 1">
-      <img src="https://raw.githubusercontent.com/Jhofra/Camaron-que-se-duerme/main/camaron2.jpg" alt="Camarón 2">
-    </div>
-
     <div class="search-container">
       <input type="text" id="searchInput" placeholder="Buscar libros o autores...">
     </div>
-
-    <button id="toggleAdminBtn">Modo Creador</button>
   </header>
 
+  <!-- CONTENIDO PRINCIPAL: NAV + MAIN -->
   <div class="container">
+    <!-- MENÚ LATERAL -->
     <nav>
       <ul id="navList">
         <li><a href="#obras-literarias">Obras Literarias</a></li>
@@ -201,12 +176,15 @@
       </ul>
     </nav>
 
+    <!-- MAIN -->
     <main id="mainContent">
+      <!-- Sección de Resultados de Búsqueda -->
       <section id="searchResults">
         <h2>Resultados de Búsqueda</h2>
         <div id="resultsContainer"></div>
       </section>
 
+      <!-- Secciones por categoría -->
       <section id="obras-literarias">
         <h2>Obras Literarias</h2>
         <div id="books-obras-literarias"></div>
@@ -249,13 +227,16 @@
     </main>
   </div>
 
+  <!-- PIE DE PÁGINA -->
   <footer>
     <p>&copy; 2025 Biblioteca Online</p>
   </footer>
 
+  <!-- LIBRERÍAS -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
 
+  <!-- SCRIPT PRINCIPAL -->
   <script>
     const books = [
       { title: "Cien Años de Soledad", author: "Gabriel García Márquez", category: "Obras Literarias", description: "Una obra maestra de la literatura latinoamericana." },
@@ -367,18 +348,19 @@
       }
     });
 
-    const toggleAdminBtn = document.getElementById("toggleAdminBtn");
-    const adminPanel = document.getElementById("adminPanel");
-
-    toggleAdminBtn.addEventListener("click", function() {
-      const pass = prompt("Ingrese la contraseña para acceder al Modo Creador:");
-      if (pass === "admin123") {
-        adminPanel.style.display = "flex";
-      } else {
-        alert("Contraseña incorrecta.");
+    /* ACTIVAR PANEL DE ADMINISTRADOR CON CTRL + BLOQ MAYÚS + 1 */
+    document.addEventListener("keydown", function(event) {
+      if (event.ctrlKey && event.getModifierState("CapsLock") && event.key === "1") {
+        const pass = prompt("Ingrese la contraseña para acceder al Modo Creador:");
+        if (pass === "admin123") {
+          document.getElementById("adminPanel").style.display = "flex";
+        } else {
+          alert("Contraseña incorrecta.");
+        }
       }
     });
 
+    /* EVENTOS PARA SUBIDA Y VISUALIZACIÓN DE ARCHIVOS */
     document.getElementById("imageUpload").addEventListener("change", function(event) {
       const file = event.target.files[0];
       if(file) {
@@ -436,6 +418,7 @@
     });
   </script>
 
+  <!-- PANEL DE ADMINISTRADOR -->
   <div id="adminPanel">
     <div class="admin-content">
       <button id="closeAdminBtn" onclick="document.getElementById('adminPanel').style.display='none'">Cerrar</button>
