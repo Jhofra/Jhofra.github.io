@@ -12,8 +12,8 @@
     }
     body {
       font-family: 'Helvetica Now', Helvetica, Arial, sans-serif;
-      background-color: #1c1b29; /* Fondo oscuro */
-      color: #fff;              /* Texto claro */
+      background-color: #1c1b29;
+      color: #fff;
     }
     /* PANTALLA DE INICIO (LANDING) */
     header.landing {
@@ -75,7 +75,7 @@
     }
     /* CONTENEDOR DE PÁGINAS */
     #pages {
-      display: none; /* Oculto hasta que se elija una sección o haya resultados */
+      display: none;
     }
     #pages section {
       display: none;
@@ -299,34 +299,27 @@
     <h1>CAMARÓN QUE SE DUERME</h1>
     <h2>MILES DE POSIBILIDADES</h2>
     <div class="icons-container">
-      <!-- LIBROS -->
       <div class="icon-item" data-target="pageLibros">
         <p>Libros</p>
       </div>
-      <!-- NOVELAS LIGERAS -->
       <div class="icon-item" data-target="pageNovelas">
         <p>Novelas Ligeras</p>
       </div>
-      <!-- MANGAS -->
       <div class="icon-item" data-target="pageMangas">
         <p>Mangas</p>
       </div>
-      <!-- AGREGAR (formulario 1) -->
       <div class="icon-item" data-target="toggleForm">
         <p>Agregar</p>
       </div>
-      <!-- AGREGAR 2 (formulario de sub-enlaces) -->
       <div class="icon-item" data-target="toggleSubLinkForm">
         <p>Agregar 2</p>
       </div>
     </div>
-    <!-- Buscador en el landing -->
     <input type="text" id="searchInput" placeholder="Buscar...">
   </header>
 
-  <!-- CONTENEDOR DE PÁGINAS (oculto inicialmente) -->
+  <!-- CONTENEDOR DE PÁGINAS -->
   <div id="pages">
-    <!-- Barra superior con botón "Inicio" -->
     <div class="page-top-nav">
       <span class="nav-home" id="btnHome">Inicio</span>
     </div>
@@ -370,7 +363,7 @@
     </section>
   </div>
 
-  <!-- FORMULARIO PARA AGREGAR NUEVO ÍTEM (PRIMARIO) -->
+  <!-- FORMULARIO PARA AGREGAR NUEVO ÍTEM -->
   <form class="add-item-form" id="addItemForm">
     <h2>Agregar nuevo</h2>
     <label for="itemImage">Portada (Imagen)</label>
@@ -391,7 +384,7 @@
     <button type="submit">Agregar</button>
   </form>
 
-  <!-- FORMULARIO PARA AGREGAR 2 (SUB-ENLACES) -->
+  <!-- FORMULARIO PARA AGREGAR SUB-ENLACES -->
   <form class="add-sublink-form" id="addSubLinkForm">
     <h2>Agregar sub-enlaces a un ítem existente</h2>
     <label for="parentItem">Elige un ítem:</label>
@@ -405,326 +398,316 @@
     <button type="submit">Agregar sub-enlace</button>
   </form>
 
-  <!-- BIBLIOTECA FUSE.JS PARA BÚSQUEDA DIFUSA -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <script>
-    // Constante de contraseña
-    const PASSWORD = "*365<vlQyOAV";
+    document.addEventListener('DOMContentLoaded', function() {
+      // Constante de contraseña
+      const PASSWORD = "*365<vlQyOAV";
 
-    /***************************************************
-     * 1. LANDING, PÁGINAS Y BOTÓN "INICIO"
-     **************************************************/
-    const landingSection = document.getElementById('landingSection');
-    const pagesContainer = document.getElementById('pages');
-    const btnHome = document.getElementById('btnHome');
-
-    function showLanding() {
-      landingSection.style.display = 'block';
-      pagesContainer.style.display = 'none';
-    }
-    function showPage(pageId) {
-      landingSection.style.display = 'none';
-      pagesContainer.style.display = 'block';
-      document.querySelectorAll('#pages section').forEach(section => {
-        section.classList.remove('active');
+      /***************************************************
+       * 1. LANDING, PÁGINAS Y BOTÓN "INICIO"
+       **************************************************/
+      const landingSection = document.getElementById('landingSection');
+      const pagesContainer = document.getElementById('pages');
+      const btnHome = document.getElementById('btnHome');
+      function showLanding() {
+        landingSection.style.display = 'block';
+        pagesContainer.style.display = 'none';
+      }
+      function showPage(pageId) {
+        landingSection.style.display = 'none';
+        pagesContainer.style.display = 'block';
+        document.querySelectorAll('#pages section').forEach(section => {
+          section.classList.remove('active');
+        });
+        document.getElementById(pageId).classList.add('active');
+      }
+      btnHome.addEventListener('click', function() {
+        showLanding();
       });
-      document.getElementById(pageId).classList.add('active');
-    }
-    btnHome.addEventListener('click', function() {
-      showLanding();
-    });
 
-    /***************************************************
-     * 2. DATOS DE SECCIONES E ÍTEMS (LOCALSTORAGE)
-     **************************************************/
-    const pagesData = [
-      { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.', type: 'page' },
-      { id: 'pageLibrosObras',         title: 'Obras Clásicas',       content: 'Contenido de Obras Clásicas.',       type: 'page' },
-      { id: 'pageLibrosMedicina',      title: 'Libros de Medicina',   content: 'Contenido de Libros de Medicina.',   type: 'page' },
-      { id: 'pageMangas',              title: 'Mangas',               content: 'Contenido de la página de Mangas.',  type: 'page' },
-      { id: 'pageNovelas',             title: 'Novelas Ligeras',      content: 'Contenido de la página de Novelas Ligeras.', type: 'page' }
-    ];
-
-    let items = JSON.parse(localStorage.getItem('items')) || [];
-    function saveItems() {
-      localStorage.setItem('items', JSON.stringify(items));
-    }
-
-    /***************************************************
-     * 3. FORMULARIO "AGREGAR" (NUEVO ÍTEM)
-     **************************************************/
-    const addItemForm = document.getElementById('addItemForm');
-    const itemImageInput = document.getElementById('itemImage');
-    const itemTitleInput = document.getElementById('itemTitle');
-    const itemLinkInput = document.getElementById('itemLink');
-    const itemCategorySelect = document.getElementById('itemCategory');
-
-    addItemForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Solicitar contraseña para agregar
-      const pass = prompt("Ingrese la contraseña para agregar:");
-      if (pass !== PASSWORD) {
-        alert("Contraseña incorrecta.");
-        return;
+      /***************************************************
+       * 2. DATOS DE SECCIONES E ÍTEMS (LOCALSTORAGE)
+       **************************************************/
+      const pagesData = [
+        { id: 'pageLibrosUniversitarios', title: 'Libros Universitarios', content: 'Contenido de Libros Universitarios.', type: 'page' },
+        { id: 'pageLibrosObras',         title: 'Obras Clásicas',       content: 'Contenido de Obras Clásicas.',       type: 'page' },
+        { id: 'pageLibrosMedicina',      title: 'Libros de Medicina',   content: 'Contenido de Libros de Medicina.',   type: 'page' },
+        { id: 'pageMangas',              title: 'Mangas',               content: 'Contenido de la página de Mangas.',  type: 'page' },
+        { id: 'pageNovelas',             title: 'Novelas Ligeras',      content: 'Contenido de la página de Novelas Ligeras.', type: 'page' }
+      ];
+      let items = JSON.parse(localStorage.getItem('items')) || [];
+      function saveItems() {
+        localStorage.setItem('items', JSON.stringify(items));
       }
-      const file = itemImageInput.files[0];
-      const title = itemTitleInput.value.trim();
-      const link = itemLinkInput.value.trim();
-      const category = itemCategorySelect.value;
-      if (!file || !title || !link || !category) {
-        alert('Por favor, completa todos los campos.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const imageDataUrl = event.target.result;
-        const newId = 'item-' + Date.now();
-        const newItem = {
-          id: newId,
-          imageDataUrl,
-          title,
-          link,
-          category,
-          type: 'item',
-          subLinks: []
+
+      /***************************************************
+       * 3. FORMULARIO "AGREGAR" (NUEVO ÍTEM)
+       **************************************************/
+      const addItemForm = document.getElementById('addItemForm');
+      const itemImageInput = document.getElementById('itemImage');
+      const itemTitleInput = document.getElementById('itemTitle');
+      const itemLinkInput = document.getElementById('itemLink');
+      const itemCategorySelect = document.getElementById('itemCategory');
+      addItemForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const pass = prompt("Ingrese la contraseña para agregar:");
+        if (pass !== PASSWORD) {
+          alert("Contraseña incorrecta.");
+          return;
+        }
+        const file = itemImageInput.files[0];
+        const title = itemTitleInput.value.trim();
+        const link = itemLinkInput.value.trim();
+        const category = itemCategorySelect.value;
+        if (!file || !title || !link || !category) {
+          alert('Por favor, completa todos los campos.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const imageDataUrl = event.target.result;
+          const newId = 'item-' + Date.now();
+          const newItem = {
+            id: newId,
+            imageDataUrl,
+            title,
+            link,
+            category,
+            type: 'item',
+            subLinks: []
+          };
+          items.push(newItem);
+          saveItems();
+          renderItems();
+          addItemForm.reset();
+          addItemForm.style.display = 'none';
         };
-        items.push(newItem);
+        reader.readAsDataURL(file);
+      });
+
+      /***************************************************
+       * 4. FORMULARIO "AGREGAR 2" (SUB-ENLACES)
+       **************************************************/
+      const addSubLinkForm = document.getElementById('addSubLinkForm');
+      const parentItemSelect = document.getElementById('parentItem');
+      const subLinkLabelInput = document.getElementById('subLinkLabel');
+      const subLinkUrlInput = document.getElementById('subLinkUrl');
+      const subLinkOrderInput = document.getElementById('subLinkOrder');
+      function fillItemDropdown() {
+        parentItemSelect.innerHTML = '<option value="">-- Selecciona un ítem --</option>';
+        items.forEach(i => {
+          const opt = document.createElement('option');
+          opt.value = i.id;
+          opt.textContent = i.title;
+          parentItemSelect.appendChild(opt);
+        });
+      }
+      addSubLinkForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const pass = prompt("Ingrese la contraseña para agregar sub-enlace:");
+        if (pass !== PASSWORD) {
+          alert("Contraseña incorrecta.");
+          return;
+        }
+        const parentId = parentItemSelect.value;
+        const label = subLinkLabelInput.value.trim();
+        const url = subLinkUrlInput.value.trim();
+        const order = subLinkOrderInput.value.trim();
+        if (!parentId || !label || !url) {
+          alert('Por favor, completa todos los campos requeridos.');
+          return;
+        }
+        const parentItem = items.find(it => it.id === parentId);
+        if (!parentItem) {
+          alert('No se encontró el ítem seleccionado.');
+          return;
+        }
+        if (!parentItem.subLinks) {
+          parentItem.subLinks = [];
+        }
+        const subLinkObj = {
+          label,
+          link: url,
+          order: order !== '' ? parseInt(order, 10) : 0
+        };
+        parentItem.subLinks.push(subLinkObj);
         saveItems();
         renderItems();
-        addItemForm.reset();
-        addItemForm.style.display = 'none';
-      };
-      reader.readAsDataURL(file);
-    });
-
-    /***************************************************
-     * 4. FORMULARIO "AGREGAR 2" (SUB-ENLACES)
-     **************************************************/
-    const addSubLinkForm = document.getElementById('addSubLinkForm');
-    const parentItemSelect = document.getElementById('parentItem');
-    const subLinkLabelInput = document.getElementById('subLinkLabel');
-    const subLinkUrlInput = document.getElementById('subLinkUrl');
-    const subLinkOrderInput = document.getElementById('subLinkOrder');
-
-    function fillItemDropdown() {
-      parentItemSelect.innerHTML = '<option value="">-- Selecciona un ítem --</option>';
-      items.forEach(i => {
-        const opt = document.createElement('option');
-        opt.value = i.id;
-        opt.textContent = i.title;
-        parentItemSelect.appendChild(opt);
+        addSubLinkForm.reset();
+        addSubLinkForm.style.display = 'none';
       });
-    }
 
-    addSubLinkForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Solicitar contraseña para agregar sub-enlace
-      const pass = prompt("Ingrese la contraseña para agregar sub-enlace:");
-      if (pass !== PASSWORD) {
-        alert("Contraseña incorrecta.");
-        return;
-      }
-      const parentId = parentItemSelect.value;
-      const label = subLinkLabelInput.value.trim();
-      const url = subLinkUrlInput.value.trim();
-      const order = subLinkOrderInput.value.trim();
-      if (!parentId || !label || !url) {
-        alert('Por favor, completa todos los campos requeridos.');
-        return;
-      }
-      const parentItem = items.find(it => it.id === parentId);
-      if (!parentItem) {
-        alert('No se encontró el ítem seleccionado.');
-        return;
-      }
-      if (!parentItem.subLinks) {
-        parentItem.subLinks = [];
-      }
-      const subLinkObj = {
-        label,
-        link: url,
-        order: order !== '' ? parseInt(order, 10) : 0
-      };
-      parentItem.subLinks.push(subLinkObj);
-      saveItems();
-      renderItems();
-      addSubLinkForm.reset();
-      addSubLinkForm.style.display = 'none';
-    });
-
-    /***************************************************
-     * 5. RENDERIZAR ÍTEMS EN SUS SECCIONES
-     **************************************************/
-    function renderItems() {
-      document.getElementById('universitariosGrid').innerHTML = '';
-      document.getElementById('obrasGrid').innerHTML = '';
-      document.getElementById('medicinaGrid').innerHTML = '';
-      document.getElementById('mangasGrid').innerHTML = '';
-      document.getElementById('novelasGrid').innerHTML = '';
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.classList.add('item-card');
-        card.innerHTML = `
-          <img src="${item.imageDataUrl}" alt="${item.title}">
-          <p class="item-title">${item.title}</p>
-          <div class="sublink-container"></div>
-          <button class="delete-btn" data-id="${item.id}">Eliminar</button>
-        `;
-        card.addEventListener('click', function(e) {
-          if(e.target.classList.contains('delete-btn')) return;
-          const sublinkDiv = card.querySelector('.sublink-container');
-          if (sublinkDiv.style.display === 'block') {
-            sublinkDiv.style.display = 'none';
-          } else {
-            sublinkDiv.innerHTML = generateSubLinksHTML(item);
-            sublinkDiv.style.display = 'block';
-          }
-        });
-        switch (item.category) {
-          case 'libros-universitarios':
-            document.getElementById('universitariosGrid').appendChild(card);
-            break;
-          case 'libros-obras':
-            document.getElementById('obrasGrid').appendChild(card);
-            break;
-          case 'libros-medicina':
-            document.getElementById('medicinaGrid').appendChild(card);
-            break;
-          case 'mangas':
-            document.getElementById('mangasGrid').appendChild(card);
-            break;
-          case 'novelas':
-            document.getElementById('novelasGrid').appendChild(card);
-            break;
-        }
-      });
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const pass = prompt("Ingrese la contraseña para eliminar:");
-          if (pass !== PASSWORD) {
-            alert("Contraseña incorrecta.");
-            return;
-          }
-          const idToDelete = this.getAttribute('data-id');
-          deleteItem(idToDelete);
-        });
-      });
-    }
-
-    function generateSubLinksHTML(item) {
-      let html = '<ul>';
-      html += `<li><a href="${item.link}" target="_blank">[Principal] ${item.title}</a></li>`;
-      if (item.subLinks && item.subLinks.length > 0) {
-        const sorted = [...item.subLinks].sort((a, b) => (a.order || 0) - (b.order || 0));
-        sorted.forEach(sub => {
-          html += `<li><a href="${sub.link}" target="_blank">${sub.label}</a></li>`;
-        });
-      }
-      html += '</ul>';
-      return html;
-    }
-
-    function deleteItem(id) {
-      items = items.filter(i => i.id !== id);
-      saveItems();
-      renderItems();
-    }
-    renderItems();
-
-    /***************************************************
-     * 6. BÚSQUEDA (FUSE.JS)
-     **************************************************/
-    function getSearchData() {
-      const dynamicData = items.map(item => ({
-        id: item.id,
-        title: item.title,
-        content: item.title,
-        category: item.category,
-        type: 'item'
-      }));
-      return pagesData.concat(dynamicData);
-    }
-
-    function doSearch(query) {
-      const allData = getSearchData();
-      const fuse = new Fuse(allData, {
-        keys: ['title', 'content'],
-        threshold: 0.4
-      });
-      const results = fuse.search(query);
-      const resultsContainer = document.getElementById('searchResults');
-      resultsContainer.innerHTML = '';
-      if (results.length === 0) {
-        resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
-      } else {
-        results.forEach(result => {
-          const div = document.createElement('div');
-          div.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
-          div.addEventListener('click', function() {
-            if (result.item.type === 'item') {
-              const cat = result.item.category;
-              if (cat === 'libros-universitarios') {
-                showPage('pageLibros');
-                showLibrosSubPage('pageLibrosUniversitarios');
-              } else if (cat === 'libros-obras') {
-                showPage('pageLibros');
-                showLibrosSubPage('pageLibrosObras');
-              } else if (cat === 'libros-medicina') {
-                showPage('pageLibros');
-                showLibrosSubPage('pageLibrosMedicina');
-              } else if (cat === 'mangas') {
-                showPage('pageMangas');
-              } else if (cat === 'novelas') {
-                showPage('pageNovelas');
-              }
+      /***************************************************
+       * 5. RENDERIZAR ÍTEMS EN SUS SECCIONES
+       **************************************************/
+      function renderItems() {
+        document.getElementById('universitariosGrid').innerHTML = '';
+        document.getElementById('obrasGrid').innerHTML = '';
+        document.getElementById('medicinaGrid').innerHTML = '';
+        document.getElementById('mangasGrid').innerHTML = '';
+        document.getElementById('novelasGrid').innerHTML = '';
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.classList.add('item-card');
+          card.innerHTML = `
+            <img src="${item.imageDataUrl}" alt="${item.title}">
+            <p class="item-title">${item.title}</p>
+            <div class="sublink-container"></div>
+            <button class="delete-btn" data-id="${item.id}">Eliminar</button>
+          `;
+          card.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-btn')) return;
+            const sublinkDiv = card.querySelector('.sublink-container');
+            if (sublinkDiv.style.display === 'block') {
+              sublinkDiv.style.display = 'none';
             } else {
-              showPage(result.item.id);
-              if (result.item.id.startsWith('pageLibros')) {
-                showLibrosSubPage(result.item.id);
-              }
+              sublinkDiv.innerHTML = generateSubLinksHTML(item);
+              sublinkDiv.style.display = 'block';
             }
           });
-          resultsContainer.appendChild(div);
+          switch (item.category) {
+            case 'libros-universitarios':
+              document.getElementById('universitariosGrid').appendChild(card);
+              break;
+            case 'libros-obras':
+              document.getElementById('obrasGrid').appendChild(card);
+              break;
+            case 'libros-medicina':
+              document.getElementById('medicinaGrid').appendChild(card);
+              break;
+            case 'mangas':
+              document.getElementById('mangasGrid').appendChild(card);
+              break;
+            case 'novelas':
+              document.getElementById('novelasGrid').appendChild(card);
+              break;
+          }
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const pass = prompt("Ingrese la contraseña para eliminar:");
+            if (pass !== PASSWORD) {
+              alert("Contraseña incorrecta.");
+              return;
+            }
+            const idToDelete = this.getAttribute('data-id');
+            deleteItem(idToDelete);
+          });
         });
       }
-      showPage('pageSearch');
-    }
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const query = this.value.trim();
-      if (query.length > 0) {
-        doSearch(query);
+      function generateSubLinksHTML(item) {
+        let html = '<ul>';
+        html += `<li><a href="${item.link}" target="_blank">[Principal] ${item.title}</a></li>`;
+        if (item.subLinks && item.subLinks.length > 0) {
+          const sorted = [...item.subLinks].sort((a, b) => (a.order || 0) - (b.order || 0));
+          sorted.forEach(sub => {
+            html += `<li><a href="${sub.link}" target="_blank">${sub.label}</a></li>`;
+          });
+        }
+        html += '</ul>';
+        return html;
       }
-    });
+      function deleteItem(id) {
+        items = items.filter(i => i.id !== id);
+        saveItems();
+        renderItems();
+      }
+      renderItems();
 
-    /***************************************************
-     * 7. EVENTOS PARA MOSTRAR/OCULTAR FORMULARIOS Y NAVEGAR
-     **************************************************/
-    document.querySelectorAll('.icon-item').forEach(icon => {
-      icon.addEventListener('click', function() {
-        const target = this.getAttribute('data-target');
-        if (target === 'toggleForm') {
-          const form = document.getElementById('addItemForm');
-          form.style.display = (form.style.display === 'block') ? 'none' : 'block';
-        } else if (target === 'toggleSubLinkForm') {
-          fillItemDropdown();
-          const subLinkForm = document.getElementById('addSubLinkForm');
-          subLinkForm.style.display = (subLinkForm.style.display === 'block') ? 'none' : 'block';
+      /***************************************************
+       * 6. BÚSQUEDA CON FUSE.JS
+       **************************************************/
+      function getSearchData() {
+        const dynamicData = items.map(item => ({
+          id: item.id,
+          title: item.title,
+          content: item.title,
+          category: item.category,
+          type: 'item'
+        }));
+        return pagesData.concat(dynamicData);
+      }
+      function doSearch(query) {
+        const allData = getSearchData();
+        const fuse = new Fuse(allData, {
+          keys: ['title', 'content'],
+          threshold: 0.4
+        });
+        const results = fuse.search(query);
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = '';
+        if (results.length === 0) {
+          resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
         } else {
-          showPage(target);
-          if (target === 'pageLibros') {
-            showLibrosSubPage('pageLibrosUniversitarios');
-          }
+          results.forEach(result => {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${result.item.title}</strong><br>${result.item.content}`;
+            div.addEventListener('click', function() {
+              if (result.item.type === 'item') {
+                const cat = result.item.category;
+                if (cat === 'libros-universitarios') {
+                  showPage('pageLibros');
+                  showLibrosSubPage('pageLibrosUniversitarios');
+                } else if (cat === 'libros-obras') {
+                  showPage('pageLibros');
+                  showLibrosSubPage('pageLibrosObras');
+                } else if (cat === 'libros-medicina') {
+                  showPage('pageLibros');
+                  showLibrosSubPage('pageLibrosMedicina');
+                } else if (cat === 'mangas') {
+                  showPage('pageMangas');
+                } else if (cat === 'novelas') {
+                  showPage('pageNovelas');
+                }
+              } else {
+                showPage(result.item.id);
+                if (result.item.id.startsWith('pageLibros')) {
+                  showLibrosSubPage(result.item.id);
+                }
+              }
+            });
+            resultsContainer.appendChild(div);
+          });
+        }
+        showPage('pageSearch');
+      }
+      document.getElementById('searchInput').addEventListener('input', function() {
+        const query = this.value.trim();
+        if (query.length > 0) {
+          doSearch(query);
         }
       });
-    });
 
-    function showLibrosSubPage(subPageId) {
-      document.querySelectorAll('#librosContent section').forEach(section => {
-        section.classList.remove('active');
+      /***************************************************
+       * 7. EVENTOS PARA FORMULARIOS Y NAVEGACIÓN DE ICON-ITEMS
+       **************************************************/
+      document.querySelectorAll('.icon-item').forEach(icon => {
+        icon.addEventListener('click', function() {
+          const target = this.getAttribute('data-target');
+          if (target === 'toggleForm') {
+            const form = document.getElementById('addItemForm');
+            form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+          } else if (target === 'toggleSubLinkForm') {
+            fillItemDropdown();
+            const subLinkForm = document.getElementById('addSubLinkForm');
+            subLinkForm.style.display = (subLinkForm.style.display === 'block') ? 'none' : 'block';
+          } else {
+            showPage(target);
+            if (target === 'pageLibros') {
+              showLibrosSubPage('pageLibrosUniversitarios');
+            }
+          }
+        });
       });
-      document.getElementById(subPageId).classList.add('active');
-    }
+      function showLibrosSubPage(subPageId) {
+        document.querySelectorAll('#librosContent section').forEach(section => {
+          section.classList.remove('active');
+        });
+        document.getElementById(subPageId).classList.add('active');
+      }
+    });
   </script>
 </body>
 </html>
