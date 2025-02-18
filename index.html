@@ -293,7 +293,6 @@
   </style>
 </head>
 <body>
-
   <!-- PANTALLA DE INICIO (LANDING) -->
   <header class="landing" id="landingSection">
     <h1>CAMARÓN QUE SE DUERME</h1>
@@ -317,7 +316,6 @@
     </div>
     <input type="text" id="searchInput" placeholder="Buscar...">
   </header>
-
   <!-- CONTENEDOR DE PÁGINAS -->
   <div id="pages">
     <div class="page-top-nav">
@@ -362,7 +360,6 @@
       <div id="searchResults"></div>
     </section>
   </div>
-
   <!-- FORMULARIO PARA AGREGAR NUEVO ÍTEM -->
   <form class="add-item-form" id="addItemForm">
     <h2>Agregar nuevo</h2>
@@ -383,8 +380,7 @@
     </select>
     <button type="submit">Agregar</button>
   </form>
-
-  <!-- FORMULARIO PARA AGREGAR SUB-ENLACES -->
+  <!-- FORMULARIO PARA AGREGAR 2 (SUB-ENLACES) -->
   <form class="add-sublink-form" id="addSubLinkForm">
     <h2>Agregar sub-enlaces a un ítem existente</h2>
     <label for="parentItem">Elige un ítem:</label>
@@ -397,11 +393,9 @@
     <input type="number" id="subLinkOrder" placeholder="Opcional" min="0">
     <button type="submit">Agregar sub-enlace</button>
   </form>
-
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Constante de contraseña
       const PASSWORD = "*365<vlQyOAV";
 
       /***************************************************
@@ -698,6 +692,15 @@
             if (target === 'pageLibros') {
               showLibrosSubPage('pageLibrosUniversitarios');
             }
+          }
+        });
+      });
+      // Delegación de eventos para subnav items (en la sección Libros)
+      document.querySelectorAll('.subnav').forEach(subnav => {
+        subnav.addEventListener('click', function(e) {
+          if(e.target && e.target.classList.contains('subnav-item')) {
+            const target = e.target.getAttribute('data-target');
+            showLibrosSubPage(target);
           }
         });
       });
