@@ -64,6 +64,7 @@ function setupEvents() {
     addExpense();
   });
 
+  el.categoriesList.addEventListener('click', handleCategoryActions);
   el.voiceBtn.addEventListener('click', handleVoiceInput);
 }
 
@@ -154,7 +155,18 @@ function renderCategories() {
 
       return `
         <article class="card">
-          <h3 class="card__title">${escapeHTML(category.name)}</h3>
+          <header class="card__header">
+            <h3 class="card__title">${escapeHTML(category.name)}</h3>
+            <button
+              type="button"
+              class="btn btn--danger btn--small"
+              data-action="delete-category"
+              data-category-id="${category.id}"
+              aria-label="Eliminar categoría ${escapeHTML(category.name)}"
+            >
+              Eliminar
+            </button>
+          </header>
           <div class="metrics">
             <div>Presupuesto: <strong>${formatSoles(budget)}</strong></div>
             <div>Gastado: <strong>${formatSoles(spent)}</strong></div>
@@ -164,10 +176,85 @@ function renderCategories() {
           <div class="progress" aria-label="Progreso de gasto ${escapeHTML(category.name)}">
             <span class="${progressClass}" style="width:${progress}%"></span>
           </div>
+          ${renderExpenseItems(category)}
         </article>
       `;
     })
     .join('');
+}
+
+function renderExpenseItems(category) {
+  if (!Array.isArray(category.expenses) || category.expenses.length === 0) {
+    return '<p class="expense-empty">Sin gastos registrados.</p>';
+  }
+
+  const recent = [...category.expenses].slice(-5).reverse();
+
+  return `
+    <ul class="expense-list" aria-label="Últimos gastos de ${escapeHTML(category.name)}">
+      ${recent
+        .map((expense) => `
+          <li class="expense-item">
+            <span>${formatSoles(expense.amount)} · ${formatDate(expense.createdAt)}</span>
+            <button
+              type="button"
+              class="btn btn--ghost btn--small"
+              data-action="delete-expense"
+              data-category-id="${category.id}"
+              data-expense-id="${expense.id}"
+              aria-label="Eliminar gasto ${formatSoles(expense.amount)}"
+            >
+              Quitar
+            </button>
+          </li>
+        `)
+        .join('')}
+    </ul>
+  `;
+}
+
+function handleCategoryActions(event) {
+  const button = event.target.closest('button[data-action]');
+  if (!button) return;
+
+  const action = button.dataset.action;
+  const categoryId = button.dataset.categoryId;
+
+  if (action === 'delete-category') {
+    deleteCategory(categoryId);
+    return;
+  }
+
+  if (action === 'delete-expense') {
+    deleteExpense(categoryId, button.dataset.expenseId);
+  }
+}
+
+function deleteCategory(categoryId) {
+  const category = state.categories.find((c) => c.id === categoryId);
+  if (!category) return;
+
+  const ok = window.confirm(`¿Eliminar la categoría "${category.name}" y todos sus gastos?`);
+  if (!ok) return;
+
+  state.categories = state.categories.filter((c) => c.id !== categoryId);
+  persist();
+  render();
+}
+
+function deleteExpense(categoryId, expenseId) {
+  const category = state.categories.find((c) => c.id === categoryId);
+  if (!category || !Array.isArray(category.expenses)) return;
+
+  const target = category.expenses.find((expense) => expense.id === expenseId);
+  if (!target) return;
+
+  category.expenses = category.expenses.filter((expense) => expense.id !== expenseId);
+  category.spent = round2(category.expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0));
+
+  persist();
+  render();
+  setVoiceFeedback(`🗑️ Se eliminó el gasto ${formatSoles(target.amount)} de ${category.name}.`);
 }
 
 function handleVoiceInput() {
@@ -277,6 +364,19 @@ function formatSoles(value) {
     currency: 'PEN',
     minimumFractionDigits: 2,
   }).format(value);
+}
+
+function formatDate(isoDate) {
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return 'Sin fecha';
+
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
 }
 
 function loadState() {

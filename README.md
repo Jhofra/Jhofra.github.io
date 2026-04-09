@@ -12,6 +12,9 @@ Aplicación de control de gastos personales por categoría, con soporte de regis
 - Registrar gastos con:
   - monto
   - categoría seleccionable
+- Borrar ítems:
+  - eliminar categoría completa (con todos sus gastos)
+  - eliminar gastos individuales por categoría
 - Registro por voz con frases como:
   - `Gastar 20 en comida`
   - `Registrar 15 soles en transporte`
