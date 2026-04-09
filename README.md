@@ -91,3 +91,11 @@ npm run cap:open:android
 - El reconocimiento usa `SpeechRecognition` del WebView/navegador.
 - Dependiendo de versión de Android/WebView, puede requerir permisos de micrófono y conectividad.
 - Si un dispositivo no soporta reconocimiento de voz web, el registro manual sigue funcionando.
+
+## Resolución de conflictos (PR)
+
+Si GitHub muestra conflictos en `README.md`, `src/app.js` o `styles/main.css`, esta rama ya deja la versión unificada con:
+
+- flujo de gastos por voz y persistencia,
+- borrado de categorías y gastos individuales,
+- estilos responsive sin bloques duplicados ni marcadores de merge (`<<<<<<<`, `=======`, `>>>>>>>`).
