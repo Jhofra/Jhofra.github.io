@@ -1,101 +1,54 @@
-# Gastos del Mes (Web + Android APK)
+# Gastos del Mes
 
-Aplicación de control de gastos personales por categoría, con soporte de registro manual y por voz.
+Aplicación web para control de gastos personales por categoría.
 
 ## Funcionalidades
 
 - Título principal: **GASTOS DEL MES**
-- Estado vacío: **No hay ningún control de dinero**
-- Crear categorías con:
+- Creación de categorías con presupuesto máximo (S/)
+- Registro de gastos manual por categoría
+- Registro de gastos por voz (Web Speech API)
+  - Ejemplos:
+    - `Gastar 20 en comida`
+    - `Registrar 15 soles en transporte`
+- Cálculo automático de porcentaje gastado
+- Barra de progreso proporcional por categoría
+- Visualización por categoría de:
   - nombre
-  - gasto máximo
-- Registrar gastos con:
-  - monto
-  - categoría seleccionable
-- Borrar ítems:
-  - eliminar categoría completa (con todos sus gastos)
-  - eliminar gastos individuales por categoría
-- Registro por voz con frases como:
-  - `Gastar 20 en comida`
-  - `Registrar 15 soles en transporte`
-- Cálculo de:
   - presupuesto
   - gastado
   - restante
   - porcentaje
-- Barra de progreso proporcional
 - Persistencia local con `localStorage`
-- Moneda por defecto: **S/** (PEN)
-- Diseño moderno, responsive y minimalista
+- Validaciones de formularios
+- Diseño responsive y minimalista
 
-## Estructura
+## Estructura del proyecto
 
 ```text
 .
 ├── index.html
-├── src/
-│   └── app.js
 ├── styles/
 │   └── main.css
-├── capacitor.config.json
-└── package.json
+└── src/
+    └── app.js
 ```
 
-## Ejecutar como web
+## Cómo ejecutar
 
-### Opción 1
-Abrir `index.html` directamente en el navegador.
+1. Clona o descarga este repositorio.
+2. Abre el archivo `index.html` en tu navegador.
+3. Recomendado: usar Chrome o Edge para la función de reconocimiento de voz.
 
-### Opción 2 (recomendada)
+También puedes levantar un servidor estático local (opcional), por ejemplo:
+
 ```bash
-npm install
-npm run start
-```
-Abrir: `http://localhost:5173`
-
----
-
-## Generar APK Android (Capacitor)
-
-> Requisitos:
-> - Node.js 20+
-> - Android Studio instalado
-> - SDK de Android configurado
-
-1. Instalar dependencias:
-```bash
-npm install
+python -m http.server 5500
 ```
 
-2. Crear plataforma Android (solo la primera vez):
-```bash
-npm run cap:add:android
-```
+Luego abre: `http://localhost:5500`
 
-3. Sincronizar cambios web a Android:
-```bash
-npm run cap:sync
-```
+## Notas de voz
 
-4. Abrir proyecto Android:
-```bash
-npm run cap:open:android
-```
-
-5. En Android Studio:
-   - `Build > Build Bundle(s) / APK(s) > Build APK(s)`
-   - Se generará el APK en la ruta que Android Studio indique.
-
-## Nota sobre reconocimiento de voz en Android
-
-- El reconocimiento usa `SpeechRecognition` del WebView/navegador.
-- Dependiendo de versión de Android/WebView, puede requerir permisos de micrófono y conectividad.
-- Si un dispositivo no soporta reconocimiento de voz web, el registro manual sigue funcionando.
-
-## Resolución de conflictos (PR)
-
-Si GitHub muestra conflictos en `README.md`, `src/app.js` o `styles/main.css`, esta rama ya deja la versión unificada con:
-
-- flujo de gastos por voz y persistencia,
-- borrado de categorías y gastos individuales,
-- estilos responsive sin bloques duplicados ni marcadores de merge (`<<<<<<<`, `=======`, `>>>>>>>`).
+- El reconocimiento de voz usa la API del navegador.
+- Si tu navegador no lo soporta, la app seguirá funcionando para registro manual.

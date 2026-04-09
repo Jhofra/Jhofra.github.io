@@ -116,14 +116,6 @@ body {
   font-size: 1.1rem;
 }
 
-.card__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 2px;
-}
-
 .metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -199,48 +191,7 @@ body {
   gap: 10px;
 }
 
-.btn--danger {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
-
-.btn--small {
-  padding: 7px 10px;
-  border-radius: 9px;
-  font-size: .82rem;
-  font-weight: 600;
-}
-
-.expense-empty {
-  margin: 12px 0 0;
-  color: var(--muted);
-  font-size: .9rem;
-}
-
-.expense-list {
-  margin: 10px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 8px;
-}
-
-.expense-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  border: 1px dashed var(--border);
-  border-radius: 10px;
-  padding: 8px 10px;
-  font-size: .9rem;
-  color: #374151;
-}
-
 @media (max-width: 640px) {
   .metrics { grid-template-columns: 1fr; }
   .actions { grid-template-columns: 1fr auto 1fr; }
-  .card__header { align-items: flex-start; }
-  .expense-item { align-items: flex-start; flex-direction: column; }
 }
